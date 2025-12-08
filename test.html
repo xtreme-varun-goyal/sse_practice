@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Palo Alto SSE-Engineer Practice Exam</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root { color-scheme: dark; }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 900px;
+      width: 100%;
+      margin: 32px 16px;
+      background: #020617;
+      border-radius: 16px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.7);
+      padding: 20px 18px 24px;
+      box-sizing: border-box;
+      border: 1px solid #1f2937;
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 1.4rem;
+      color: #facc15;
+      letter-spacing: 0.03em;
+    }
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      color: #9ca3af;
+      margin-bottom: 12px;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .meta-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    select#questionSelect {
+      background: #020617;
+      color: #e5e7eb;
+      border-radius: 999px;
+      border: 1px solid #374151;
+      padding: 4px 10px;
+      font-size: 0.8rem;
+    }
+    .question-box {
+      margin-top: 12px;
+      padding: 16px 14px;
+      border-radius: 12px;
+      background: radial-gradient(circle at top left, #111827, #020617);
+      border: 1px solid #111827;
+    }
+    .question-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .topic {
+      font-size: 0.8rem;
+      color: #93c5fd;
+      margin-bottom: 4px;
+    }
+    .select-hint {
+      font-size: 0.75rem;
+      color: #f97316;
+    }
+    .question-text {
+      font-size: 0.98rem;
+      margin-bottom: 10px;
+      line-height: 1.4;
+      white-space: normal;
+    }
+    ul.options {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    ul.options li {
+      margin-bottom: 8px;
+    }
+    label.option-label {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 10px 10px;
+      border-radius: 10px;
+      background: #020617;
+      border: 1px solid #111827;
+      cursor: pointer;
+      transition: background 0.12s ease, border-color 0.12s ease, transform 0.05s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    label.option-label:hover {
+      background: #0b1120;
+      border-color: #1f2937;
+      transform: translateY(-1px);
+    }
+    input[type="radio"],
+    input[type="checkbox"] {
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+    .letters {
+      font-weight: 600;
+      color: #60a5fa;
+      width: 18px;
+      flex-shrink: 0;
+    }
+    .buttons {
+      margin-top: 16px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    button {
+      border-radius: 999px;
+      border: none;
+      padding: 10px 18px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background 0.15s, transform 0.05s, box-shadow 0.15s;
+      -webkit-tap-highlight-color: transparent;
+      min-width: 120px;
+    }
+    button.primary {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: #022c22;
+      box-shadow: 0 10px 30px rgba(34,197,94,0.35);
+    }
+    button.primary:disabled {
+      background: #1f2937;
+      color: #6b7280;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+    button.secondary {
+      background: #111827;
+      color: #e5e7eb;
+      border: 1px solid #1f2937;
+    }
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.6);
+    }
+    .result {
+      margin-top: 14px;
+      font-size: 0.95rem;
+      padding: 10px 12px;
+      border-radius: 8px;
+    }
+    .result.correct {
+      background: rgba(22,163,74,0.12);
+      border: 1px solid #16a34a;
+      color: #bbf7d0;
+    }
+    .result.incorrect {
+      background: rgba(220,38,38,0.15);
+      border: 1px solid #f97373;
+      color: #fecaca;
+    }
+    .explanation {
+      margin-top: 6px;
+      font-size: 0.9rem;
+      color: #cbd5f5;
+      line-height: 1.35;
+    }
+    .score {
+      margin-top: 18px;
+      font-size: 0.92rem;
+      color: #9ca3af;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      background: rgba(37,99,235,0.1);
+      color: #93c5fd;
+      border: 1px solid rgba(37,99,235,0.3);
+    }
+    .hidden { display: none; }
+    .summary {
+      margin-top: 18px;
+      padding: 14px 14px;
+      border-radius: 12px;
+      background: #020617;
+      border: 1px solid #111827;
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        margin: 12px 8px 16px;
+        padding: 14px 10px 18px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      }
+      h1 { font-size: 1.15rem; }
+      .meta {
+        flex-direction: column;
+        align-items: flex-start;
+        font-size: 0.8rem;
+      }
+      .question-box { padding: 12px 10px; }
+      .question-text { font-size: 0.95rem; }
+      label.option-label { padding: 9px 8px; }
+      button {
+        flex: 1 1 100%;
+        justify-content: center;
+      }
+      .score { font-size: 0.85rem; }
+      .summary { font-size: 0.9rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Palo Alto SSE-Engineer Practice Exam</h1>
+  <div class="meta">
+    <div><span class="badge" id="topicBadge">Topic</span></div>
+    <div class="meta-right">
+      <span>Question <span id="currentIndex">1</span> / <span id="totalQuestions">0</span></span>
+      <select id="questionSelect"></select>
+    </div>
+  </div>
+
+  <div class="question-box">
+    <div class="question-header">
+      <div class="topic" id="topicText"></div>
+      <div class="select-hint" id="selectHint"></div>
+    </div>
+    <div class="question-text" id="questionText"></div>
+    <ul class="options" id="optionsList"></ul>
+    <div class="buttons">
+      <button class="secondary" id="prevBtn">Previous</button>
+      <button class="primary" id="submitBtn">Submit Answer</button>
+      <button class="secondary" id="nextBtn">Next</button>
+    </div>
+    <div id="resultBox" class="result hidden"></div>
+  </div>
+
+  <div class="score" id="scoreBox"></div>
+  <div class="summary hidden" id="summaryBox"></div>
+</div>
+
+<script>
+  let questions = [];
+  let currentQuestion = 0;
+  let score = 0;
+
+  const topicBadge = document.getElementById("topicBadge");
+  const topicText = document.getElementById("topicText");
+  const selectHint = document.getElementById("selectHint");
+  const questionTextEl = document.getElementById("questionText");
+  const optionsListEl = document.getElementById("optionsList");
+  const submitBtn = document.getElementById("submitBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const prevBtn = document.getElementById("prevBtn");
+  const resultBox = document.getElementById("resultBox");
+  const scoreBox = document.getElementById("scoreBox");
+  const summaryBox = document.getElementById("summaryBox");
+  const currentIndexSpan = document.getElementById("currentIndex");
+  const totalQuestionsSpan = document.getElementById("totalQuestions");
+  const questionSelect = document.getElementById("questionSelect");
+
+  // IMPORTANT: this assumes the file is named sse_questions.json
+  fetch("sse_questions.json")
+    .then(res => res.json())
+    .then(data => {
+      questions = data;
+      totalQuestionsSpan.textContent = questions.length.toString();
+      buildQuestionSelect();
+      renderQuestion();
+    })
+    .catch(err => {
+      console.error("Error loading sse_questions.json:", err);
+      questionTextEl.textContent = "Error loading questions. Check console/logs.";
+      submitBtn.disabled = true;
+      nextBtn.disabled = true;
+      prevBtn.disabled = true;
+    });
+
+  function buildQuestionSelect() {
+    questionSelect.innerHTML = "";
+    questions.forEach((q, idx) => {
+      const opt = document.createElement("option");
+      opt.value = idx;
+      opt.textContent = `Go to Question ${idx + 1}`;
+      questionSelect.appendChild(opt);
+    });
+  }
+
+  function renderQuestion() {
+    const q = questions[currentQuestion];
+    currentIndexSpan.textContent = (currentQuestion + 1).toString();
+    questionSelect.value = currentQuestion.toString();
+
+    topicBadge.textContent = q.topic || "Question";
+    topicText.textContent = `Question ${currentQuestion + 1}`;
+    questionTextEl.textContent = q.question;
+
+    const correctArray = Array.isArray(q.correct) ? q.correct : [];
+    const multi = q.type === "multi" || correctArray.length > 1;
+    const count = q.selectCount || (multi ? correctArray.length : 1);
+
+    if (multi) {
+      selectHint.textContent = count
+        ? `Select ${count} answer${count > 1 ? "s" : ""}`
+        : "Select all that apply";
+    } else {
+      selectHint.textContent = "Select one answer";
+    }
+
+    optionsListEl.innerHTML = "";
+    const letters = ["A", "B", "C", "D", "E", "F"];
+    q.options.forEach((opt, idx) => {
+      const li = document.createElement("li");
+      const label = document.createElement("label");
+      label.className = "option-label";
+
+      const input = document.createElement("input");
+      input.type = multi ? "checkbox" : "radio";
+      input.name = "option";
+      input.value = idx;
+
+      const letterSpan = document.createElement("span");
+      letterSpan.className = "letters";
+      letterSpan.textContent = letters[idx] + ".";
+
+      const textSpan = document.createElement("span");
+      textSpan.textContent = opt;
+
+      label.appendChild(input);
+      label.appendChild(letterSpan);
+      label.appendChild(textSpan);
+      li.appendChild(label);
+      optionsListEl.appendChild(li);
+    });
+
+    resultBox.classList.add("hidden");
+    resultBox.classList.remove("correct", "incorrect");
+    resultBox.textContent = "";
+    submitBtn.disabled = false;
+
+    prevBtn.disabled = currentQuestion === 0;
+    nextBtn.disabled = currentQuestion === questions.length - 1;
+
+    updateScoreBox();
+  }
+
+  function getSelectedIndices() {
+    const inputs = document.querySelectorAll("input[name='option']");
+    const selected = [];
+    inputs.forEach(inp => {
+      if (inp.checked) selected.push(parseInt(inp.value, 10));
+    });
+    return selected;
+  }
+
+  function arraysEqual(a, b) {
+    if (a.length !== b.length) return false;
+    const as = [...a].sort((x, y) => x - y);
+    const bs = [...b].sort((x, y) => x - y);
+    for (let i = 0; i < as.length; i++) {
+      if (as[i] !== bs[i]) return false;
+    }
+    return true;
+  }
+
+  function updateScoreBox() {
+    scoreBox.textContent = `Score: ${score} / ${questions.length}`;
+  }
+
+  function showSummary() {
+    summaryBox.classList.remove("hidden");
+    const pct = ((score / questions.length) * 100).toFixed(1);
+    summaryBox.innerHTML = `
+      <strong>Exam finished!</strong><br>
+      You answered <strong>${score}</strong> out of <strong>${questions.length}</strong> correctly (${pct}%).<br>
+      Use the dropdown to jump back to any question and re-check explanations.
+    `;
+  }
+
+  submitBtn.addEventListener("click", () => {
+    if (!questions.length) return;
+
+    const q = questions[currentQuestion];
+    const selected = getSelectedIndices();
+    const correct = Array.isArray(q.correct) ? q.correct : [];
+    const multi = q.type === "multi" || correct.length > 1;
+    const expectedCount = q.selectCount || (multi ? correct.length : 1);
+
+    if (selected.length === 0) {
+      alert("Please select an answer before submitting.");
+      return;
+    }
+
+    if (multi && expectedCount && selected.length !== expectedCount) {
+      if (!confirm(`You selected ${selected.length} answer(s), but the question expects ${expectedCount}. Submit anyway?`)) {
+        return;
+      }
+    }
+
+    submitBtn.disabled = true;
+
+    const letters = ["A", "B", "C", "D", "E", "F"];
+    const correctLetters = correct.map(i => letters[i]).join(", ");
+    const isCorrect = arraysEqual(selected, correct);
+
+    resultBox.classList.remove("hidden", "correct", "incorrect");
+
+    if (isCorrect) {
+      score++;
+      resultBox.classList.add("correct");
+      resultBox.textContent = "Correct!";
+    } else {
+      resultBox.classList.add("incorrect");
+      resultBox.innerHTML = `Incorrect. Correct answer(s): <strong>${correctLetters}</strong>`;
+    }
+
+    const expDiv = document.createElement("div");
+    expDiv.className = "explanation";
+    expDiv.textContent = q.explanation || "";
+    resultBox.appendChild(expDiv);
+
+    updateScoreBox();
+
+    if (currentQuestion === questions.length - 1) {
+      showSummary();
+    }
+  });
+
+  nextBtn.addEventListener("click", () => {
+    if (currentQuestion < questions.length - 1) {
+      currentQuestion++;
+      renderQuestion();
+    }
+  });
+
+  prevBtn.addEventListener("click", () => {
+    if (currentQuestion > 0) {
+      currentQuestion--;
+      renderQuestion();
+    }
+  });
+
+  questionSelect.addEventListener("change", (e) => {
+    const idx = parseInt(e.target.value, 10);
+    if (!Number.isNaN(idx)) {
+      currentQuestion = idx;
+      renderQuestion();
+    }
+  });
+</script>
+</body>
+</html>
