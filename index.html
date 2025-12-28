@@ -85,7 +85,7 @@
       font-size: 0.98rem;
       margin-bottom: 10px;
       line-height: 1.4;
-      white-space: normal;
+      white-space: pre-line;
     }
     ul.options {
       list-style: none;
@@ -186,6 +186,7 @@
       font-size: 0.9rem;
       color: #cbd5f5;
       line-height: 1.35;
+      white-space: pre-line;
     }
     .score {
       margin-top: 18px;
@@ -318,26 +319,155 @@
 
     @media (max-width: 600px) {
       .container {
-        margin: 12px 8px 16px;
-        padding: 14px 10px 18px;
+        margin: 8px 6px 12px;
+        padding: 12px 10px 16px;
         border-radius: 12px;
         box-shadow: 0 10px 30px rgba(0,0,0,0.6);
       }
-      h1 { font-size: 1.15rem; }
+      h1 { font-size: 1.1rem; margin-bottom: 12px; }
       .meta {
         flex-direction: column;
         align-items: flex-start;
         font-size: 0.8rem;
+        gap: 6px;
+      }
+      .meta-right {
+        width: 100%;
+        justify-content: space-between;
+      }
+      select#questionSelect {
+        flex: 1;
+        max-width: 160px;
       }
       .question-box { padding: 12px 10px; }
-      .question-text { font-size: 0.95rem; }
-      label.option-label { padding: 9px 8px; }
+      .question-text { font-size: 0.95rem; line-height: 1.5; }
+
+      /* Larger touch targets for options */
+      label.option-label {
+        padding: 14px 12px;
+        min-height: 44px;
+        gap: 10px;
+      }
+      input[type="radio"],
+      input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        margin-top: 0;
+      }
+      .letters {
+        font-size: 1rem;
+        width: 22px;
+      }
+      ul.options li {
+        margin-bottom: 10px;
+      }
+
+      /* Button improvements */
+      .buttons {
+        gap: 8px;
+      }
       button {
         flex: 1 1 100%;
         justify-content: center;
+        padding: 14px 16px;
+        font-size: 1rem;
+        min-height: 48px;
+      }
+      button.secondary {
+        flex: 1 1 45%;
+      }
+      #submitBtn {
+        order: -1;
+        flex: 1 1 100%;
+      }
+
+      /* Mode selector mobile layout */
+      .mode-selector {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 12px;
+      }
+      .mode-option {
+        padding: 8px 0;
+        width: 100%;
+      }
+      .mode-option input[type="radio"] {
+        width: 18px;
+        height: 18px;
+      }
+
+      /* Timer bar mobile */
+      .timer-bar {
+        padding: 10px 12px;
+        gap: 10px;
+      }
+      .timer-display {
+        font-size: 1.2rem;
+      }
+      .restart-btn {
+        padding: 8px 14px;
+        font-size: 0.85rem;
+      }
+
+      /* Start screen mobile */
+      .start-screen {
+        padding: 24px 12px;
+      }
+      .start-screen h2 {
+        font-size: 1.15rem;
+      }
+      .start-screen p {
+        font-size: 0.9rem;
+      }
+      .start-screen .info-box {
+        padding: 12px;
+      }
+      .start-screen .info-box li {
+        font-size: 0.9rem;
+      }
+      .start-btn {
+        width: 100%;
+        padding: 16px 24px;
+        font-size: 1.05rem;
+      }
+
+      /* Results and summary */
+      .result {
+        padding: 12px;
+        font-size: 0.9rem;
+      }
+      .explanation {
+        font-size: 0.85rem;
+        line-height: 1.45;
       }
       .score { font-size: 0.85rem; }
-      .summary { font-size: 0.9rem; }
+      .summary {
+        font-size: 0.9rem;
+        padding: 12px;
+      }
+      .summary button {
+        margin-top: 8px;
+        margin-left: 0 !important;
+        width: 100%;
+      }
+
+      /* Select hint more visible */
+      .select-hint {
+        font-size: 0.8rem;
+        padding: 4px 0;
+      }
+    }
+
+    /* Extra small screens */
+    @media (max-width: 380px) {
+      .container {
+        margin: 4px;
+        padding: 10px 8px 14px;
+      }
+      h1 { font-size: 1rem; }
+      .timer-display { font-size: 1.1rem; }
+      label.option-label { padding: 12px 10px; }
     }
   </style>
 </head>
@@ -358,11 +488,11 @@
     <div class="mode-selector" style="margin-bottom: 24px; justify-content: center;">
       <span class="mode-label">Answer Mode:</span>
       <label class="mode-option">
-        <input type="radio" name="answerMode" value="immediate" checked>
+        <input type="radio" name="startAnswerMode" value="immediate">
         <span>Show after each question</span>
       </label>
       <label class="mode-option">
-        <input type="radio" name="answerMode" value="end">
+        <input type="radio" name="startAnswerMode" value="end" checked>
         <span>Show at end</span>
       </label>
     </div>
@@ -381,11 +511,11 @@
   <div class="mode-selector locked" id="modeSelector">
     <span class="mode-label">Answer Mode:</span>
     <label class="mode-option">
-      <input type="radio" name="answerMode" value="immediate" checked>
+      <input type="radio" name="answerMode" value="immediate">
       <span>Show after each question</span>
     </label>
     <label class="mode-option">
-      <input type="radio" name="answerMode" value="end">
+      <input type="radio" name="answerMode" value="end" checked>
       <span>Show at end</span>
     </label>
   </div>
@@ -521,7 +651,7 @@
     timerBar.classList.remove('hidden');
 
     // Sync mode selector from start screen to exam content
-    const selectedMode = document.querySelector('#startScreen input[name="answerMode"]:checked').value;
+    const selectedMode = document.querySelector('#startScreen input[name="startAnswerMode"]:checked').value;
     document.querySelectorAll('#modeSelector input[name="answerMode"]').forEach(radio => {
       radio.checked = radio.value === selectedMode;
     });
@@ -565,9 +695,9 @@
     finishBtn.classList.add('hidden');
     modeSelector.classList.remove('locked');
 
-    // Reset mode selector
-    document.querySelectorAll('input[name="answerMode"]').forEach(radio => {
-      radio.checked = radio.value === 'immediate';
+    // Reset mode selectors (both start screen and exam content)
+    document.querySelectorAll('input[name="answerMode"], input[name="startAnswerMode"]').forEach(radio => {
+      radio.checked = radio.value === 'end';
     });
 
     updateTimerDisplay();
