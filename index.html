@@ -204,6 +204,108 @@
       border: 1px solid rgba(37,99,235,0.3);
     }
     .hidden { display: none; }
+    .mode-selector {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+      background: #111827;
+      border-radius: 10px;
+      border: 1px solid #1f2937;
+      flex-wrap: wrap;
+    }
+    .mode-label {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      font-weight: 600;
+    }
+    .mode-option {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      color: #e5e7eb;
+      cursor: pointer;
+    }
+    .mode-option input[type="radio"] {
+      accent-color: #22c55e;
+    }
+    .mode-selector.locked {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+    .start-screen {
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .start-screen h2 {
+      color: #facc15;
+      margin-bottom: 16px;
+      font-size: 1.3rem;
+    }
+    .start-screen p {
+      color: #9ca3af;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+    .start-screen .info-box {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 24px;
+      text-align: left;
+    }
+    .start-screen .info-box li {
+      margin-bottom: 8px;
+      color: #e5e7eb;
+    }
+    .start-btn {
+      font-size: 1.1rem;
+      padding: 14px 32px;
+      min-width: 180px;
+    }
+    .timer-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      margin-bottom: 12px;
+      background: #111827;
+      border-radius: 10px;
+      border: 1px solid #1f2937;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .timer-display {
+      font-size: 1.1rem;
+      font-weight: 700;
+      font-family: monospace;
+      color: #22c55e;
+    }
+    .timer-display.warning {
+      color: #f97316;
+    }
+    .timer-display.danger {
+      color: #dc2626;
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .restart-btn {
+      background: #7f1d1d;
+      color: #fecaca;
+      border: 1px solid #991b1b;
+      font-size: 0.8rem;
+      padding: 6px 12px;
+      min-width: auto;
+    }
+    .restart-btn:hover {
+      background: #991b1b;
+    }
     .summary {
       margin-top: 18px;
       padding: 14px 14px;
@@ -242,6 +344,52 @@
 <body>
 <div class="container">
   <h1>Palo Alto SSE-Engineer Practice Exam</h1>
+
+  <!-- Start Screen -->
+  <div class="start-screen" id="startScreen">
+    <h2>Welcome to the Practice Exam</h2>
+    <div class="info-box">
+      <ul>
+        <li><strong>50 Questions</strong> - Multiple choice (single and multi-select)</li>
+        <li><strong>90 Minutes</strong> - Timer starts when you begin</li>
+        <li><strong>Choose your mode</strong> - See answers immediately or at the end</li>
+      </ul>
+    </div>
+    <div class="mode-selector" style="margin-bottom: 24px; justify-content: center;">
+      <span class="mode-label">Answer Mode:</span>
+      <label class="mode-option">
+        <input type="radio" name="answerMode" value="immediate" checked>
+        <span>Show after each question</span>
+      </label>
+      <label class="mode-option">
+        <input type="radio" name="answerMode" value="end">
+        <span>Show at end</span>
+      </label>
+    </div>
+    <button class="primary start-btn" id="startBtn">Start Exam</button>
+  </div>
+
+  <!-- Timer Bar (hidden until exam starts) -->
+  <div class="timer-bar hidden" id="timerBar">
+    <div class="timer-display" id="timerDisplay">90:00</div>
+    <button class="restart-btn" id="restartBtn">Restart Exam</button>
+  </div>
+
+  <!-- Exam Content (hidden until exam starts) -->
+  <div id="examContent" class="hidden">
+
+  <div class="mode-selector locked" id="modeSelector">
+    <span class="mode-label">Answer Mode:</span>
+    <label class="mode-option">
+      <input type="radio" name="answerMode" value="immediate" checked>
+      <span>Show after each question</span>
+    </label>
+    <label class="mode-option">
+      <input type="radio" name="answerMode" value="end">
+      <span>Show at end</span>
+    </label>
+  </div>
+
   <div class="meta">
     <div><span class="badge" id="topicBadge">Topic</span></div>
     <div class="meta-right">
@@ -261,19 +409,33 @@
       <button class="secondary" id="prevBtn">Previous</button>
       <button class="primary" id="submitBtn">Submit Answer</button>
       <button class="secondary" id="nextBtn">Next</button>
+      <button class="secondary hidden" id="finishBtn">Finish Exam</button>
     </div>
     <div id="resultBox" class="result hidden"></div>
   </div>
 
   <div class="score" id="scoreBox"></div>
   <div class="summary hidden" id="summaryBox"></div>
+
+  </div><!-- end examContent -->
 </div>
 
 <script>
   let questions = [];
   let currentQuestion = 0;
   let score = 0;
+  let userAnswers = []; // Store user's answers for "end" mode
+  let examStarted = false;
+  let timerInterval = null;
+  let timeRemaining = 90 * 60; // 90 minutes in seconds
 
+  const startScreen = document.getElementById("startScreen");
+  const examContent = document.getElementById("examContent");
+  const timerBar = document.getElementById("timerBar");
+  const timerDisplay = document.getElementById("timerDisplay");
+  const startBtn = document.getElementById("startBtn");
+  const restartBtn = document.getElementById("restartBtn");
+  const modeSelector = document.getElementById("modeSelector");
   const topicBadge = document.getElementById("topicBadge");
   const topicText = document.getElementById("topicText");
   const selectHint = document.getElementById("selectHint");
@@ -288,6 +450,7 @@
   const currentIndexSpan = document.getElementById("currentIndex");
   const totalQuestionsSpan = document.getElementById("totalQuestions");
   const questionSelect = document.getElementById("questionSelect");
+  const finishBtn = document.getElementById("finishBtn");
 
   // IMPORTANT: this assumes the file is named sse_questions.json
   fetch("sse_questions.json")
@@ -296,15 +459,123 @@
       questions = data;
       totalQuestionsSpan.textContent = questions.length.toString();
       buildQuestionSelect();
-      renderQuestion();
+      // Don't render question yet - wait for start button
     })
     .catch(err => {
       console.error("Error loading sse_questions.json:", err);
-      questionTextEl.textContent = "Error loading questions. Check console/logs.";
-      submitBtn.disabled = true;
-      nextBtn.disabled = true;
-      prevBtn.disabled = true;
+      startBtn.disabled = true;
+      startBtn.textContent = "Error loading questions";
     });
+
+  // Timer functions
+  function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  }
+
+  function updateTimerDisplay() {
+    timerDisplay.textContent = formatTime(timeRemaining);
+
+    // Update timer color based on time remaining
+    timerDisplay.classList.remove('warning', 'danger');
+    if (timeRemaining <= 300) { // 5 minutes or less
+      timerDisplay.classList.add('danger');
+    } else if (timeRemaining <= 900) { // 15 minutes or less
+      timerDisplay.classList.add('warning');
+    }
+  }
+
+  function startTimer() {
+    updateTimerDisplay();
+    timerInterval = setInterval(() => {
+      timeRemaining--;
+      updateTimerDisplay();
+
+      if (timeRemaining <= 0) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        timeUp();
+      }
+    }, 1000);
+  }
+
+  function stopTimer() {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+  }
+
+  function timeUp() {
+    alert("Time's up! Your exam will now be submitted.");
+    showSummary();
+  }
+
+  function startExam() {
+    if (!questions.length) return;
+
+    // Hide start screen, show exam content
+    startScreen.classList.add('hidden');
+    examContent.classList.remove('hidden');
+    timerBar.classList.remove('hidden');
+
+    // Sync mode selector from start screen to exam content
+    const selectedMode = document.querySelector('#startScreen input[name="answerMode"]:checked').value;
+    document.querySelectorAll('#modeSelector input[name="answerMode"]').forEach(radio => {
+      radio.checked = radio.value === selectedMode;
+    });
+
+    // Show/hide finish button based on mode
+    if (selectedMode === 'end') {
+      finishBtn.classList.remove('hidden');
+    }
+
+    // Start timer and render first question
+    startTimer();
+    renderQuestion();
+    examStarted = true;
+    lockModeSelector();
+  }
+
+  function restartExam() {
+    if (!confirm("Are you sure you want to restart the exam? All your progress will be lost.")) {
+      return;
+    }
+
+    // Stop timer
+    stopTimer();
+
+    // Reset all state
+    currentQuestion = 0;
+    score = 0;
+    userAnswers = [];
+    examStarted = false;
+    timeRemaining = 90 * 60;
+
+    // Hide exam content, show start screen
+    examContent.classList.add('hidden');
+    timerBar.classList.add('hidden');
+    startScreen.classList.remove('hidden');
+
+    // Reset UI elements
+    summaryBox.classList.add('hidden');
+    summaryBox.innerHTML = '';
+    resultBox.classList.add('hidden');
+    finishBtn.classList.add('hidden');
+    modeSelector.classList.remove('locked');
+
+    // Reset mode selector
+    document.querySelectorAll('input[name="answerMode"]').forEach(radio => {
+      radio.checked = radio.value === 'immediate';
+    });
+
+    updateTimerDisplay();
+  }
+
+  // Event listeners for start and restart
+  startBtn.addEventListener('click', startExam);
+  restartBtn.addEventListener('click', restartExam);
 
   function buildQuestionSelect() {
     questionSelect.innerHTML = "";
@@ -366,7 +637,37 @@
     resultBox.classList.add("hidden");
     resultBox.classList.remove("correct", "incorrect");
     resultBox.textContent = "";
-    submitBtn.disabled = false;
+
+    const mode = getAnswerMode();
+
+    // Check if in review mode (end mode after results shown)
+    if (mode === 'end' && userAnswers.reviewMode) {
+      showResultForQuestion(currentQuestion);
+      submitBtn.disabled = true;
+      // Restore user's previous selection visually
+      const previousAnswer = userAnswers[currentQuestion] || [];
+      const inputs = document.querySelectorAll("input[name='option']");
+      inputs.forEach(inp => {
+        if (previousAnswer.includes(parseInt(inp.value, 10))) {
+          inp.checked = true;
+        }
+      });
+    } else if (mode === 'end' && userAnswers[currentQuestion]) {
+      // Already answered in end mode - restore selection and show saved message
+      const previousAnswer = userAnswers[currentQuestion];
+      const inputs = document.querySelectorAll("input[name='option']");
+      inputs.forEach(inp => {
+        if (previousAnswer.includes(parseInt(inp.value, 10))) {
+          inp.checked = true;
+        }
+      });
+      resultBox.classList.remove("hidden");
+      resultBox.classList.add("correct");
+      resultBox.textContent = "Answer saved! You can change it and re-submit.";
+      submitBtn.disabled = false;
+    } else {
+      submitBtn.disabled = false;
+    }
 
     prevBtn.disabled = currentQuestion === 0;
     nextBtn.disabled = currentQuestion === questions.length - 1;
@@ -393,23 +694,121 @@
     return true;
   }
 
+  function getAnswerMode() {
+    const selected = document.querySelector('input[name="answerMode"]:checked');
+    return selected ? selected.value : 'immediate';
+  }
+
+  function lockModeSelector() {
+    modeSelector.classList.add('locked');
+    examStarted = true;
+  }
+
   function updateScoreBox() {
-    scoreBox.textContent = `Score: ${score} / ${questions.length}`;
+    const mode = getAnswerMode();
+    if (mode === 'end') {
+      const answered = userAnswers.filter(a => a !== null && a !== undefined).length;
+      scoreBox.textContent = `Progress: ${answered} / ${questions.length} answered`;
+    } else {
+      scoreBox.textContent = `Score: ${score} / ${questions.length}`;
+    }
   }
 
   function showSummary() {
+    // Stop the timer
+    stopTimer();
+
+    const mode = getAnswerMode();
     summaryBox.classList.remove("hidden");
+
+    if (mode === 'end') {
+      // Calculate score now
+      score = 0;
+      questions.forEach((q, idx) => {
+        const correct = Array.isArray(q.correct) ? q.correct : [];
+        const userAnswer = userAnswers[idx] || [];
+        if (arraysEqual(userAnswer, correct)) {
+          score++;
+        }
+      });
+    }
+
     const pct = ((score / questions.length) * 100).toFixed(1);
+    const passFail = pct >= 70 ? '<span style="color: #22c55e;">PASS</span>' : '<span style="color: #dc2626;">FAIL</span>';
+    const timeUsed = formatTime((90 * 60) - timeRemaining);
+
+    if (mode === 'end') {
+      summaryBox.innerHTML = `
+        <strong>Exam finished!</strong> ${passFail}<br>
+        You answered <strong>${score}</strong> out of <strong>${questions.length}</strong> correctly (${pct}%).<br>
+        Time used: <strong>${timeUsed}</strong><br><br>
+        <button class="primary" id="showResultsBtn">Show All Results</button>
+        <button class="secondary" id="restartFromSummaryBtn" style="margin-left: 10px;">Restart Exam</button>
+      `;
+      document.getElementById('showResultsBtn').addEventListener('click', showAllResults);
+      document.getElementById('restartFromSummaryBtn').addEventListener('click', restartExam);
+    } else {
+      summaryBox.innerHTML = `
+        <strong>Exam finished!</strong> ${passFail}<br>
+        You answered <strong>${score}</strong> out of <strong>${questions.length}</strong> correctly (${pct}%).<br>
+        Time used: <strong>${timeUsed}</strong><br>
+        Use the dropdown to jump back to any question and re-check explanations.<br><br>
+        <button class="secondary" id="restartFromSummaryBtn">Restart Exam</button>
+      `;
+      document.getElementById('restartFromSummaryBtn').addEventListener('click', restartExam);
+    }
+
+    updateScoreBox();
+  }
+
+  function showAllResults() {
+    // Mark exam as in review mode and show current question result
+    userAnswers.reviewMode = true;
+    showResultForQuestion(currentQuestion);
+
+    const pct = ((score / questions.length) * 100).toFixed(1);
+    const passFail = pct >= 70 ? '<span style="color: #22c55e;">PASS</span>' : '<span style="color: #dc2626;">FAIL</span>';
+    const timeUsed = formatTime((90 * 60) - timeRemaining);
+
     summaryBox.innerHTML = `
-      <strong>Exam finished!</strong><br>
+      <strong>Exam finished!</strong> ${passFail}<br>
       You answered <strong>${score}</strong> out of <strong>${questions.length}</strong> correctly (${pct}%).<br>
-      Use the dropdown to jump back to any question and re-check explanations.
+      Time used: <strong>${timeUsed}</strong><br>
+      Use the dropdown to review each question with explanations.<br><br>
+      <button class="secondary" id="restartFromSummaryBtn">Restart Exam</button>
     `;
+    document.getElementById('restartFromSummaryBtn').addEventListener('click', restartExam);
+  }
+
+  function showResultForQuestion(qIndex) {
+    const q = questions[qIndex];
+    const correct = Array.isArray(q.correct) ? q.correct : [];
+    const userAnswer = userAnswers[qIndex] || [];
+    const letters = ["A", "B", "C", "D", "E", "F"];
+    const correctLetters = correct.map(i => letters[i]).join(", ");
+    const isCorrect = arraysEqual(userAnswer, correct);
+
+    resultBox.classList.remove("hidden", "correct", "incorrect");
+
+    if (isCorrect) {
+      resultBox.classList.add("correct");
+      resultBox.textContent = "Correct!";
+    } else {
+      resultBox.classList.add("incorrect");
+      const userLetters = userAnswer.map(i => letters[i]).join(", ") || "None";
+      resultBox.innerHTML = `Incorrect. Your answer: <strong>${userLetters}</strong>. Correct answer(s): <strong>${correctLetters}</strong>`;
+    }
+
+    const expDiv = document.createElement("div");
+    expDiv.className = "explanation";
+    expDiv.textContent = q.explanation || "";
+    resultBox.appendChild(expDiv);
   }
 
   submitBtn.addEventListener("click", () => {
     if (!questions.length) return;
 
+    const mode = getAnswerMode();
     const q = questions[currentQuestion];
     const selected = getSelectedIndices();
     const correct = Array.isArray(q.correct) ? q.correct : [];
@@ -427,32 +826,60 @@
       }
     }
 
-    submitBtn.disabled = true;
-
-    const letters = ["A", "B", "C", "D", "E", "F"];
-    const correctLetters = correct.map(i => letters[i]).join(", ");
-    const isCorrect = arraysEqual(selected, correct);
-
-    resultBox.classList.remove("hidden", "correct", "incorrect");
-
-    if (isCorrect) {
-      score++;
-      resultBox.classList.add("correct");
-      resultBox.textContent = "Correct!";
-    } else {
-      resultBox.classList.add("incorrect");
-      resultBox.innerHTML = `Incorrect. Correct answer(s): <strong>${correctLetters}</strong>`;
+    // Lock mode selector once user starts answering
+    if (!examStarted) {
+      lockModeSelector();
     }
 
-    const expDiv = document.createElement("div");
-    expDiv.className = "explanation";
-    expDiv.textContent = q.explanation || "";
-    resultBox.appendChild(expDiv);
+    submitBtn.disabled = true;
 
-    updateScoreBox();
+    if (mode === 'end') {
+      // Store answer for later evaluation
+      userAnswers[currentQuestion] = selected;
 
-    if (currentQuestion === questions.length - 1) {
-      showSummary();
+      // Show confirmation without revealing correct answer
+      resultBox.classList.remove("hidden", "correct", "incorrect");
+      resultBox.classList.add("correct"); // Use green styling for "saved"
+      resultBox.textContent = "Answer saved! Move to next question or finish exam.";
+
+      updateScoreBox();
+
+      // Check if all questions are answered
+      const allAnswered = questions.every((_, idx) => userAnswers[idx] && userAnswers[idx].length > 0);
+      if (allAnswered) {
+        showSummary();
+      } else if (currentQuestion === questions.length - 1) {
+        // On last question, show how many are unanswered
+        const unanswered = questions.filter((_, idx) => !userAnswers[idx] || userAnswers[idx].length === 0).length;
+        resultBox.innerHTML = `Answer saved! <strong>${unanswered}</strong> question(s) still unanswered. Use dropdown to complete them, then you'll see your results.`;
+      }
+    } else {
+      // Immediate mode - show result right away
+      const letters = ["A", "B", "C", "D", "E", "F"];
+      const correctLetters = correct.map(i => letters[i]).join(", ");
+      const isCorrect = arraysEqual(selected, correct);
+
+      resultBox.classList.remove("hidden", "correct", "incorrect");
+
+      if (isCorrect) {
+        score++;
+        resultBox.classList.add("correct");
+        resultBox.textContent = "Correct!";
+      } else {
+        resultBox.classList.add("incorrect");
+        resultBox.innerHTML = `Incorrect. Correct answer(s): <strong>${correctLetters}</strong>`;
+      }
+
+      const expDiv = document.createElement("div");
+      expDiv.className = "explanation";
+      expDiv.textContent = q.explanation || "";
+      resultBox.appendChild(expDiv);
+
+      updateScoreBox();
+
+      if (currentQuestion === questions.length - 1) {
+        showSummary();
+      }
     }
   });
 
@@ -475,6 +902,40 @@
     if (!Number.isNaN(idx)) {
       currentQuestion = idx;
       renderQuestion();
+    }
+  });
+
+  // Show/hide finish button based on mode
+  document.querySelectorAll('input[name="answerMode"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      const mode = getAnswerMode();
+      if (mode === 'end') {
+        finishBtn.classList.remove('hidden');
+      } else {
+        finishBtn.classList.add('hidden');
+      }
+    });
+  });
+
+  finishBtn.addEventListener("click", () => {
+    const answered = userAnswers.filter(a => a !== null && a !== undefined && a.length > 0).length;
+    const unanswered = questions.length - answered;
+
+    if (unanswered > 0) {
+      if (!confirm(`You have ${unanswered} unanswered question(s). Are you sure you want to finish and see your results?`)) {
+        return;
+      }
+    }
+    showSummary();
+  });
+
+  // Warn user before leaving page if exam is in progress
+  window.addEventListener('beforeunload', (e) => {
+    if (examStarted && timerInterval) {
+      // Exam is running - show warning
+      e.preventDefault();
+      e.returnValue = 'You have an exam in progress. Are you sure you want to leave? Your progress will be lost.';
+      return e.returnValue;
     }
   });
 </script>
