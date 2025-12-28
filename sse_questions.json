@@ -177,6 +177,7 @@
     "topic": "",
     "type": "multi",
     "selectCount": 2,
+    "image": "11.jpg",
     "question": "Based on the image below, which two statements describe the reason and action required to resolve the errors? (Choose two.)",
     "options": [
       "The client is misconfigured.",
@@ -332,6 +333,7 @@
     "topic": "",
     "type": "single",
     "selectCount": null,
+    "image": "20.jpg",
     "question": "An intern is tasked with changing the Anti-Spyware Profile used for security rules defined in the GlobalProtect folder. All security rules are using the Default Prisma Profile. The intern reports that the options are greyed out and cannot be modified when selecting the Default Prisma Profile.\n\nBased on the image below, which action will allow the intern to make the required modifications?",
     "options": [
       "Request edit access for the GlobalProtect scope.",

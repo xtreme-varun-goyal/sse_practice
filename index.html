@@ -146,6 +146,38 @@
       line-height: 1.4;
       white-space: pre-line;
     }
+    .question-image {
+      max-width: 100%;
+      border-radius: 8px;
+      margin: 12px 0;
+      border: 1px solid #374151;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .question-image:hover {
+      transform: scale(1.02);
+    }
+    .image-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.9);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+    }
+    .image-modal.active {
+      display: flex;
+    }
+    .image-modal img {
+      max-width: 95%;
+      max-height: 95%;
+      border-radius: 8px;
+    }
     ul.options {
       list-style: none;
       padding: 0;
@@ -608,6 +640,7 @@
       <div class="select-hint" id="selectHint"></div>
     </div>
     <div class="question-text" id="questionText"></div>
+    <img class="question-image hidden" id="questionImage" src="" alt="Question Image" onclick="openImageModal()">
     <ul class="options" id="optionsList"></ul>
     <div class="buttons">
       <button class="secondary" id="prevBtn">Previous</button>
@@ -627,6 +660,11 @@
   </div>
 
   </div><!-- end examContent -->
+</div>
+
+<!-- Image Modal for full-screen view -->
+<div class="image-modal" id="imageModal" onclick="closeImageModal()">
+  <img id="modalImage" src="" alt="Full size image">
 </div>
 
 <script>
@@ -661,6 +699,43 @@
   const questionSelect = document.getElementById("questionSelect");
   const finishBtn = document.getElementById("finishBtn");
   const progressGrid = document.getElementById("progressGrid");
+  const questionImage = document.getElementById("questionImage");
+  const imageModal = document.getElementById("imageModal");
+  const modalImage = document.getElementById("modalImage");
+
+  // Image modal functions
+  function openImageModal() {
+    modalImage.src = questionImage.src;
+    imageModal.classList.add('active');
+  }
+
+  function closeImageModal() {
+    imageModal.classList.remove('active');
+  }
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    // Close modal on Escape key
+    if (e.key === 'Escape') {
+      closeImageModal();
+      return;
+    }
+
+    // Only handle arrow keys if exam is started and modal is not open
+    if (!examStarted || imageModal.classList.contains('active')) return;
+
+    // Left arrow - previous question
+    if (e.key === 'ArrowLeft' && currentQuestion > 0) {
+      currentQuestion--;
+      renderQuestion();
+    }
+
+    // Right arrow - next question
+    if (e.key === 'ArrowRight' && currentQuestion < questions.length - 1) {
+      currentQuestion++;
+      renderQuestion();
+    }
+  });
 
   // IMPORTANT: this assumes the file is named sse_questions.json
   fetch("sse_questions.json")
@@ -901,6 +976,15 @@
     topicBadge.textContent = q.topic || "Question";
     topicText.textContent = `Question ${currentQuestion + 1}`;
     questionTextEl.textContent = q.question;
+
+    // Show/hide question image
+    if (q.image) {
+      questionImage.src = q.image;
+      questionImage.classList.remove('hidden');
+    } else {
+      questionImage.classList.add('hidden');
+      questionImage.src = '';
+    }
 
     const correctArray = Array.isArray(q.correct) ? q.correct : [];
     const multi = q.type === "multi" || correctArray.length > 1;
