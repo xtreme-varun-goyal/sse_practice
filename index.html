@@ -726,12 +726,14 @@
 
     // Left arrow - previous question
     if (e.key === 'ArrowLeft' && currentQuestion > 0) {
+      autoSaveAnswer();
       currentQuestion--;
       renderQuestion();
     }
 
     // Right arrow - next question
     if (e.key === 'ArrowRight' && currentQuestion < questions.length - 1) {
+      autoSaveAnswer();
       currentQuestion++;
       renderQuestion();
     }
@@ -793,6 +795,7 @@
   }
 
   function timeUp() {
+    autoSaveAnswer();
     alert("Time's up! Your exam will now be submitted.");
     showSummary();
   }
@@ -900,6 +903,7 @@
       dot.dataset.index = idx;
       dot.title = `Question ${idx + 1} - Not answered`;
       dot.addEventListener('click', () => {
+        autoSaveAnswer();
         currentQuestion = idx;
         renderQuestion();
       });
@@ -1083,6 +1087,20 @@
       if (as[i] !== bs[i]) return false;
     }
     return true;
+  }
+
+  // Auto-save current answer if any option is selected (for "end" mode)
+  function autoSaveAnswer() {
+    const mode = getAnswerMode();
+    if (mode !== 'end') return; // Only auto-save in "end" mode
+    if (userAnswers.reviewMode) return; // Don't save in review mode
+
+    const selected = getSelectedIndices();
+    if (selected.length > 0) {
+      userAnswers[currentQuestion] = selected;
+      updateScoreBox();
+      updateProgressIndicators();
+    }
   }
 
   function getAnswerMode() {
@@ -1278,6 +1296,7 @@
 
   nextBtn.addEventListener("click", () => {
     if (currentQuestion < questions.length - 1) {
+      autoSaveAnswer();
       currentQuestion++;
       renderQuestion();
     }
@@ -1285,6 +1304,7 @@
 
   prevBtn.addEventListener("click", () => {
     if (currentQuestion > 0) {
+      autoSaveAnswer();
       currentQuestion--;
       renderQuestion();
     }
@@ -1293,6 +1313,7 @@
   questionSelect.addEventListener("change", (e) => {
     const idx = parseInt(e.target.value, 10);
     if (!Number.isNaN(idx)) {
+      autoSaveAnswer();
       currentQuestion = idx;
       renderQuestion();
     }
@@ -1311,6 +1332,9 @@
   });
 
   finishBtn.addEventListener("click", () => {
+    // Auto-save current answer before finishing
+    autoSaveAnswer();
+
     const answered = userAnswers.filter(a => a !== null && a !== undefined && a.length > 0).length;
     const unanswered = questions.length - answered;
 
