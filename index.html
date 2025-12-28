@@ -58,6 +58,65 @@
       padding: 4px 10px;
       font-size: 0.8rem;
     }
+    /* Question progress grid */
+    .progress-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 12px;
+      background: #111827;
+      border-radius: 10px;
+      border: 1px solid #1f2937;
+      margin-bottom: 12px;
+    }
+    .progress-grid-title {
+      width: 100%;
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+    .progress-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.15s;
+      border: 2px solid transparent;
+    }
+    .progress-dot:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+    .progress-dot.unanswered {
+      background: #1f2937;
+      color: #6b7280;
+      border-color: #374151;
+    }
+    .progress-dot.answered {
+      background: #166534;
+      color: #bbf7d0;
+      border-color: #22c55e;
+    }
+    .progress-dot.current {
+      border-color: #facc15;
+      box-shadow: 0 0 8px rgba(250, 204, 21, 0.5);
+    }
+    .progress-dot.correct {
+      background: #166534;
+      color: #bbf7d0;
+      border-color: #22c55e;
+    }
+    .progress-dot.incorrect {
+      background: #7f1d1d;
+      color: #fecaca;
+      border-color: #dc2626;
+    }
     .question-box {
       margin-top: 12px;
       padding: 16px 14px;
@@ -410,6 +469,21 @@
         font-size: 0.85rem;
       }
 
+      /* Progress grid mobile */
+      .progress-grid {
+        gap: 4px;
+        padding: 10px;
+      }
+      .progress-grid-title {
+        font-size: 0.75rem;
+      }
+      .progress-dot {
+        width: 24px;
+        height: 24px;
+        font-size: 0.65rem;
+        border-radius: 4px;
+      }
+
       /* Start screen mobile */
       .start-screen {
         padding: 24px 12px;
@@ -547,6 +621,11 @@
   <div class="score" id="scoreBox"></div>
   <div class="summary hidden" id="summaryBox"></div>
 
+  <!-- Question Progress Grid -->
+  <div class="progress-grid" id="progressGrid">
+    <div class="progress-grid-title">Question Progress (click to jump)</div>
+  </div>
+
   </div><!-- end examContent -->
 </div>
 
@@ -581,6 +660,7 @@
   const totalQuestionsSpan = document.getElementById("totalQuestions");
   const questionSelect = document.getElementById("questionSelect");
   const finishBtn = document.getElementById("finishBtn");
+  const progressGrid = document.getElementById("progressGrid");
 
   // IMPORTANT: this assumes the file is named sse_questions.json
   fetch("sse_questions.json")
@@ -642,8 +722,22 @@
     showSummary();
   }
 
+  // Fisher-Yates shuffle algorithm
+  function shuffleArray(array) {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  }
+
   function startExam() {
     if (!questions.length) return;
+
+    // Shuffle questions for each new exam
+    questions = shuffleArray(questions);
+    buildQuestionSelect();
 
     // Hide start screen, show exam content
     startScreen.classList.add('hidden');
@@ -712,8 +806,90 @@
     questions.forEach((q, idx) => {
       const opt = document.createElement("option");
       opt.value = idx;
-      opt.textContent = `Go to Question ${idx + 1}`;
+      opt.textContent = `Q${idx + 1} ○`;
       questionSelect.appendChild(opt);
+    });
+    buildProgressGrid();
+  }
+
+  function buildProgressGrid() {
+    // Clear existing dots but keep the title
+    const title = progressGrid.querySelector('.progress-grid-title');
+    progressGrid.innerHTML = '';
+    progressGrid.appendChild(title);
+
+    questions.forEach((q, idx) => {
+      const dot = document.createElement("div");
+      dot.className = "progress-dot unanswered";
+      dot.textContent = idx + 1;
+      dot.dataset.index = idx;
+      dot.title = `Question ${idx + 1} - Not answered`;
+      dot.addEventListener('click', () => {
+        currentQuestion = idx;
+        renderQuestion();
+      });
+      progressGrid.appendChild(dot);
+    });
+    updateProgressIndicators();
+  }
+
+  function updateProgressIndicators() {
+    const mode = getAnswerMode();
+    const inReviewMode = userAnswers.reviewMode;
+
+    // Update dropdown options
+    const options = questionSelect.querySelectorAll('option');
+    options.forEach((opt, idx) => {
+      const hasAnswer = userAnswers[idx] && userAnswers[idx].length > 0;
+
+      if (inReviewMode) {
+        // In review mode, show correct/incorrect
+        const q = questions[idx];
+        const correct = Array.isArray(q.correct) ? q.correct : [];
+        const userAnswer = userAnswers[idx] || [];
+        const isCorrect = arraysEqual(userAnswer, correct);
+        opt.textContent = `Q${idx + 1} ${isCorrect ? '✓' : '✗'}`;
+      } else if (hasAnswer) {
+        opt.textContent = `Q${idx + 1} ✓`;
+      } else {
+        opt.textContent = `Q${idx + 1} ○`;
+      }
+    });
+
+    // Update progress grid dots
+    const dots = progressGrid.querySelectorAll('.progress-dot');
+    dots.forEach((dot, idx) => {
+      const hasAnswer = userAnswers[idx] && userAnswers[idx].length > 0;
+
+      // Reset classes
+      dot.classList.remove('unanswered', 'answered', 'current', 'correct', 'incorrect');
+
+      // Add current indicator
+      if (idx === currentQuestion) {
+        dot.classList.add('current');
+      }
+
+      if (inReviewMode) {
+        // In review mode, show correct/incorrect
+        const q = questions[idx];
+        const correct = Array.isArray(q.correct) ? q.correct : [];
+        const userAnswer = userAnswers[idx] || [];
+        const isCorrect = arraysEqual(userAnswer, correct);
+
+        if (isCorrect) {
+          dot.classList.add('correct');
+          dot.title = `Question ${idx + 1} - Correct`;
+        } else {
+          dot.classList.add('incorrect');
+          dot.title = `Question ${idx + 1} - Incorrect`;
+        }
+      } else if (hasAnswer) {
+        dot.classList.add('answered');
+        dot.title = `Question ${idx + 1} - Answered`;
+      } else {
+        dot.classList.add('unanswered');
+        dot.title = `Question ${idx + 1} - Not answered`;
+      }
     });
   }
 
@@ -803,6 +979,7 @@
     nextBtn.disabled = currentQuestion === questions.length - 1;
 
     updateScoreBox();
+    updateProgressIndicators();
   }
 
   function getSelectedIndices() {
@@ -894,6 +1071,7 @@
   function showAllResults() {
     // Mark exam as in review mode and show current question result
     userAnswers.reviewMode = true;
+    updateProgressIndicators();
     showResultForQuestion(currentQuestion);
 
     const pct = ((score / questions.length) * 100).toFixed(1);
@@ -973,6 +1151,7 @@
       resultBox.textContent = "Answer saved! Move to next question or finish exam.";
 
       updateScoreBox();
+      updateProgressIndicators();
 
       // Check if all questions are answered
       const allAnswered = questions.every((_, idx) => userAnswers[idx] && userAnswers[idx].length > 0);
