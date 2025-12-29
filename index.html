@@ -620,7 +620,7 @@
     <span class="exam-selector-label">Select Exam:</span>
     <select id="examSelect">
       <option value="sse_questions.json">Practice Exam 1 (50 Questions)</option>
-      <option value="sse_questions_100_enhanced.json">Practice Exam 2 (Enhanced, Exam-Quality)</option>
+      <option value="sse_questions_100_enhanced.json">Practice Exam 2 (50 from 100 Enhanced Questions)</option>
     </select>
   </div>
 
@@ -786,9 +786,18 @@
   });
 
   // Weighted selection based on official Palo Alto SSE exam blueprint
-  // Uses exam_domain field from JSON (pre-categorized questions)
-  // Domain weights: Planning (22%), Services (22%), Browser (22%), Admin (16%), Troubleshooting (18%)
-  const domainWeights = {
+  // Domain weights for Exam 1 (sse_questions.json)
+  const domainWeightsExam1 = {
+    'Planning & Deployment': 11,        // 22% of 50
+    'Prisma Access Services': 11,       // 22% of 50
+    'Prisma Browser': 11,               // 22% of 50
+    'Administration & Operation': 8,    // 16% of 50
+    'Troubleshooting': 9                // 18% of 50
+  };
+
+  // Domain weights for Exam 2 (sse_questions_100_enhanced.json)
+  // Official Palo Alto SSE exam blueprint - selects 50 from 100 pool
+  const domainWeightsExam2 = {
     'Planning & Deployment': 11,        // 22% of 50
     'Prisma Access Services': 11,       // 22% of 50
     'Prisma Browser': 11,               // 22% of 50
@@ -797,7 +806,7 @@
   };
 
   // Select questions with weighted domain distribution using exam_domain field
-  function selectWeightedQuestions(allQuestions, targetCount) {
+  function selectWeightedQuestions(allQuestions, targetCount, domainWeights) {
     const selectedQuestions = [];
     const usedIds = new Set();
 
@@ -854,11 +863,12 @@
     fetch(examFile)
       .then(res => res.json())
       .then(data => {
-        // For the enhanced exam, shuffle all questions
+        // For the enhanced exam, select 50 weighted questions from the 100 pool
         if (examFile === 'sse_questions_100_enhanced.json') {
-          questions = shuffleArray(data);
+          questions = selectWeightedQuestions(data, 50, domainWeightsExam2);
         } else {
-          questions = data;
+          // Exam 1 uses all questions, shuffled
+          questions = shuffleArray(data);
         }
         totalQuestionsSpan.textContent = questions.length.toString();
         questionCountInfo.textContent = `${questions.length} Questions`;
