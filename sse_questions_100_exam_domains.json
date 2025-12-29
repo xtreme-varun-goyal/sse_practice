@@ -1,0 +1,2013 @@
+[
+  {
+    "id": 1,
+    "topic": "Mobile Users",
+    "type": "single",
+    "selectCount": null,
+    "question": "A global company deploys Prisma Access for Mobile Users. Users in UAE complain that all internet browsing hairpins to Europe even though a Middle East compute location exists. Policies are consistent across regions. What is the most likely design misstep? The rollout is managed through centralized policy, and users authenticate via enterprise SSO. The issue is repeatable across multiple devices, and security policy is confirmed identical across regions/tenants. You are asked to identify the most likely design/config cause before making broad changes.",
+    "options": [
+      "URL Filtering is disabled in the UAE region",
+      "The UAE users are assigned to a mobile user location/pool mapped to Europe compute",
+      "HIP checks are failing and forcing fallback routing",
+      "TLS decryption is enabled only in Europe"
+    ],
+    "correct": [
+      1
+    ],
+    "explanation": "If users are mapped to the wrong compute region (by location/pool/region mapping), their traffic can exit via a distant location, causing consistent hairpin latency even if closer compute exists.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Multitenancy, RBAC & Governance",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 2,
+    "topic": "Service Connections",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer onboards two Service Connections: one to AWS (us-east-1) and one to an on-prem DC (Toronto). Private apps in AWS are reachable, but on-prem apps intermittently fail. The IPsec tunnel stays \"UP.\" Which is the best first verification step? The customer has redundant underlay links and expects deterministic private-app reachability. Monitoring shows the tunnel state remains healthy, but application reachability changes over time. Assume firewall rules on the private side are unchanged since last known-good.",
+    "options": [
+      "Confirm BGP/route exchange for the on-prem SC and whether routes are being preferred/withdrawn",
+      "Disable threat prevention to reduce CPU",
+      "Change all Mobile Users to Explicit Proxy",
+      "Disable TLS decryption for all private apps"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "A tunnel being UP does not guarantee stable route advertisement/selection. Intermittent private-app reachability commonly ties to routing exchange, preference, or route withdrawal/instability.",
+    "domain": "Prisma Access Planning & Deployment",
+    "subcategory": "Private App Access (ZTNA)",
+    "exam_domain": "Planning & Deployment"
+  },
+  {
+    "id": 3,
+    "topic": "Remote Networks",
+    "type": "single",
+    "selectCount": null,
+    "question": "Remote Network site \"Branch-17\" reports internet works, but private apps fail. The Branch tunnel is up. Prisma Access shows these routes: 10.10.0.0/16 via ServiceConnection-DC and 10.10.20.0/24 via RemoteNetwork-Branch17. The private app is 10.10.20.45. What is the most likely cause? The site reports the tunnel status as established, and basic pings may succeed intermittently. The change window was recent, and the operations team wants the first check that most quickly narrows root cause. Assume endpoints and application servers are up.",
+    "options": [
+      "Incorrect URL category for the private app",
+      "Overlapping routes with wrong preference; Branch route not being selected for that host",
+      "HIP check mismatch",
+      "DNS Security policy is blocking it"
+    ],
+    "correct": [
+      1
+    ],
+    "explanation": "Overlapping prefixes can cause unexpected path selection if routing preference/metrics or propagation differs across enforcement points; the more specific route should win, so a selection/preference issue is the prime suspect.",
+    "domain": "Prisma Access Troubleshooting",
+    "subcategory": "Private App Access (ZTNA)",
+    "exam_domain": "Troubleshooting"
+  },
+  {
+    "id": 4,
+    "topic": "Zero Trust",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer wants B2B partner access to only app1.internal:8443 and app2.internal:9443. Partners should not access any other private subnets. Which design best matches Zero Trust? The scenario is occurring in a production rollout where changes must be targeted and low-risk. Use the option that best reflects first-principles troubleshooting and correct feature intent.",
+    "options": [
+      "Give partners full VPN to the private subnet, restrict later",
+      "Publish both apps on the public internet behind MFA",
+      "Use private app access with app definitions (FQDN/ports) and identity-based authorization",
+      "Put partners in a separate Remote Network and allow intra-RN routes"
+    ],
+    "correct": [
+      2
+    ],
+    "explanation": "Zero Trust favors app-level access with explicit app definitions and identity-based authorization, rather than broad subnet access.",
+    "domain": "Prisma Access Planning & Deployment",
+    "subcategory": "Private App Access (ZTNA)",
+    "exam_domain": "Planning & Deployment"
+  },
+  {
+    "id": 5,
+    "topic": "App Acceleration",
+    "type": "single",
+    "selectCount": null,
+    "question": "Mobile user traffic to Microsoft 365 is slow after rollout. The company requires inspection and doesn't want to bypass security. Which solution is most likely intended to improve performance for key SaaS apps without removing security controls? The rollout is managed through centralized policy, and users authenticate via enterprise SSO. The issue is repeatable across multiple devices, and security policy is confirmed identical across regions/tenants. You are asked to identify the most likely design/config cause before making broad changes.",
+    "options": [
+      "App Acceleration for targeted apps",
+      "Disable TLS decryption globally",
+      "Force all traffic through a single Service Connection",
+      "Use RBI for all Microsoft 365 sessions"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "App Acceleration is designed to optimize application experience while preserving the security inspection path.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Multitenancy, RBAC & Governance",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 6,
+    "topic": "TLS Decryption",
+    "type": "single",
+    "selectCount": null,
+    "question": "A company enables TLS decryption. Immediately, several finance sites break while most sites work. Browser shows \"connection reset.\" What is the most correct immediate remediation approach? The organization is using a browser-based approach specifically to avoid granting full network access to unmanaged devices. Users are successfully authenticating, but the behavior differs between managed (full client) and unmanaged (browser) access paths. You need the most likely explanation or next check consistent with least-privilege design.",
+    "options": [
+      "Disable decryption for all users globally",
+      "Add targeted no-decrypt exceptions for the affected sites and validate residual risk controls",
+      "Disable URL filtering (it conflicts with decryption)",
+      "Remove certificates from endpoints"
+    ],
+    "correct": [
+      1
+    ],
+    "explanation": "Some sites (often with certificate pinning) can break under decryption. The standard response is targeted no-decrypt exceptions with documented risk treatment—not a global rollback.",
+    "domain": "Prisma Access Planning & Deployment",
+    "subcategory": "Mobile Users & Endpoint Access",
+    "exam_domain": "Planning & Deployment"
+  },
+  {
+    "id": 7,
+    "topic": "Troubleshooting",
+    "type": "multi",
+    "selectCount": 2,
+    "question": "A tenant admin claims \"policy isn't enforcing.\" In logs, traffic is allowed but the wrong rule is matching. Identity seems inconsistent across users. (Choose two) Which two checks are most relevant? Administration is split between a central security team and delegated regional admins. The environment uses shared/baseline objects where appropriate, and scope/attachment determines enforcement. The goal is to resolve the issue while preserving separation of duties.",
+    "options": [
+      "Traffic log rule-match details for the session",
+      "Identity mapping (user/group) status/logs for those users",
+      "IPsec Phase 2 lifetimes",
+      "BGP community strings on service connections"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "First confirm the matched rule/action in traffic logs, then confirm identity/group mapping for affected users. The other options usually don't explain wrong-rule matches.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Logging, Visibility & Operations",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 8,
+    "topic": "Multitenancy",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer uses multitenancy. They create a URL Filtering profile in the parent tenant expecting it to apply everywhere, but it only applies to some child tenants. What is the most likely reason? Administration is split between a central security team and delegated regional admins. The environment uses shared/baseline objects where appropriate, and scope/attachment determines enforcement. The goal is to resolve the issue while preserving separation of duties.",
+    "options": [
+      "URL Filtering profiles cannot be shared across tenants",
+      "The rule that references the profile exists only in certain tenant scopes",
+      "TLS decryption must be enabled first",
+      "The profile requires RBI to be enabled"
+    ],
+    "correct": [
+      1
+    ],
+    "explanation": "Objects alone don't enforce behavior—rules and scope/attachments determine where a profile is applied. If only some tenants reference it, only those tenants see the effect.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Multitenancy, RBAC & Governance",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 9,
+    "topic": "HIP Checks",
+    "type": "single",
+    "selectCount": null,
+    "question": "A company wants Mobile Users to access private apps through Prisma Access, but only corporate-managed devices should be allowed. BYOD should be blocked. What is the best control combination? The rollout is managed through centralized policy, and users authenticate via enterprise SSO. The issue is repeatable across multiple devices, and security policy is confirmed identical across regions/tenants. You are asked to identify the most likely design/config cause before making broad changes.",
+    "options": [
+      "URL filtering + QoS only",
+      "HIP checks (posture) tied to policy that permits private app access",
+      "RBI for all users",
+      "Disable split tunnel and rely on logs"
+    ],
+    "correct": [
+      1
+    ],
+    "explanation": "Device posture controls (HIP) are used to differentiate managed vs unmanaged endpoints and can be enforced via policy conditions.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Multitenancy, RBAC & Governance",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 10,
+    "topic": "IPsec",
+    "type": "single",
+    "selectCount": null,
+    "question": "A Remote Network uses IPsec to Prisma Access. Tunnel is \"UP,\" but traffic drops. The log shows repeated \"Phase 2 rekey failed\" events. What is the best next action? The site reports the tunnel status as established, and basic pings may succeed intermittently. The change window was recent, and the operations team wants the first check that most quickly narrows root cause. Assume endpoints and application servers are up.",
+    "options": [
+      "Review IKE/IPsec proposals and lifetimes for Phase 2 mismatch between site and Prisma Access",
+      "Change URL category database",
+      "Disable decryption",
+      "Move compute location"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Phase 2 rekey failures strongly indicate proposal/lifetime/transform mismatch or negotiation issues for Phase 2.",
+    "domain": "Prisma Access Troubleshooting",
+    "subcategory": "Mobile Users & Endpoint Access",
+    "exam_domain": "Troubleshooting"
+  },
+  {
+    "id": 11,
+    "topic": "Traffic Replication",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer wants to mirror traffic to a third-party NDR tool for deep analysis while maintaining normal enforcement. Which Prisma Access capability best fits? The scenario is occurring in a production rollout where changes must be targeted and low-risk. Use the option that best reflects first-principles troubleshooting and correct feature intent.",
+    "options": [
+      "Traffic replication",
+      "App Acceleration",
+      "RBI",
+      "QoS"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Traffic replication is meant for sending traffic copies/metadata to external analysis tools without changing enforcement.",
+    "domain": "Prisma Access Services",
+    "subcategory": "Data Security (DLP / SaaS / AI / IoT)",
+    "exam_domain": "Prisma Access Services"
+  },
+  {
+    "id": 12,
+    "topic": "DLP",
+    "type": "single",
+    "selectCount": null,
+    "question": "A security team needs to prevent users from uploading customer PII to personal Google Drive. They also want visibility into violations. Which service is most directly aligned? The security team expects policy enforcement based on content inspection, and they need auditability in logs for compliance. Assume the user is not using an alternative network path unless stated, and focus on the most probable control-plane/data-plane reason.",
+    "options": [
+      "Enterprise DLP",
+      "DNS Security",
+      "App Acceleration",
+      "Routing preference"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Enterprise DLP is designed to detect and enforce controls on sensitive data movement (e.g., uploads) with auditing/visibility.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Logging, Visibility & Operations",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 13,
+    "topic": "QoS",
+    "type": "single",
+    "selectCount": null,
+    "question": "A company enables QoS and marks voice traffic as high priority. Users still complain of choppy calls at one branch only. Which is the best first thing to validate? The scenario is occurring in a production rollout where changes must be targeted and low-risk. Use the option that best reflects first-principles troubleshooting and correct feature intent.",
+    "options": [
+      "That the branch uplink is congested and the QoS markings are honored end-to-end on that path",
+      "That URL Filtering is updated",
+      "That decryption is disabled",
+      "That RBI is disabled"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "QoS only helps if congestion exists and markings are honored across the underlay/edge. One-branch issues often trace to local uplink congestion or mis-honored markings.",
+    "domain": "Prisma Access Troubleshooting",
+    "subcategory": "Security Enforcement & Inspection",
+    "exam_domain": "Troubleshooting"
+  },
+  {
+    "id": 14,
+    "topic": "Decryption Policy",
+    "type": "single",
+    "selectCount": null,
+    "question": "After enabling decryption, a customer wants to ensure they are not decrypting certain regulated categories (e.g., banking). What is the best approach? The scenario is occurring in a production rollout where changes must be targeted and low-risk. Use the option that best reflects first-principles troubleshooting and correct feature intent.",
+    "options": [
+      "Disable all decryption",
+      "Use decryption policy with targeted exclusions based on categories/FQDNs and document rationale",
+      "Use QoS to skip decrypt",
+      "Use split tunnel so traffic never reaches Prisma Access"
+    ],
+    "correct": [
+      1
+    ],
+    "explanation": "Decryption should be scoped by policy with justified exclusions for regulated/fragile categories; blanket disablement is rarely acceptable.",
+    "domain": "Prisma Access Services",
+    "subcategory": "Security Enforcement & Inspection",
+    "exam_domain": "Prisma Access Services"
+  },
+  {
+    "id": 15,
+    "topic": "SaaS Security",
+    "type": "multi",
+    "selectCount": 2,
+    "question": "A company wants strong SaaS governance: discover usage, rate risk, and control sanctioned vs unsanctioned apps. (Choose two) Which two are most aligned? The customer has redundant underlay links and expects deterministic private-app reachability. Monitoring shows the tunnel state remains healthy, but application reachability changes over time. Assume firewall rules on the private side are unchanged since last known-good.",
+    "options": [
+      "SaaS Security",
+      "Enterprise DLP",
+      "IPsec proposal tuning",
+      "URL category DB updates"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "SaaS Security covers discovery/risk/sanctioning. DLP complements by controlling sensitive data flows within SaaS (often part of governance programs).",
+    "domain": "Prisma Access Services",
+    "subcategory": "Data Security (DLP / SaaS / AI / IoT)",
+    "exam_domain": "Prisma Access Services"
+  },
+  {
+    "id": 16,
+    "topic": "RBI",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer needs to isolate unknown websites for contractors (unmanaged endpoints) but still allow access to job-relevant sites. Which control is most appropriate? The scenario is occurring in a production rollout where changes must be targeted and low-risk. Use the option that best reflects first-principles troubleshooting and correct feature intent.",
+    "options": [
+      "RBI",
+      "QoS",
+      "BGP routing preference",
+      "Service Connection"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Remote Browser Isolation isolates potentially risky web sessions from endpoints while allowing access.",
+    "domain": "Prisma Access Services",
+    "subcategory": "Browser-Based Access & RBI",
+    "exam_domain": "Prisma Browser"
+  },
+  {
+    "id": 17,
+    "topic": "Prisma Browser",
+    "type": "single",
+    "selectCount": null,
+    "question": "A tenant's security policy blocks upload for a certain group. Users report uploads still succeed when using a browser-only approach for unmanaged devices. What is the most likely explanation? The organization is using a browser-based approach specifically to avoid granting full network access to unmanaged devices. Users are successfully authenticating, but the behavior differs between managed (full client) and unmanaged (browser) access paths. You need the most likely explanation or next check consistent with least-privilege design.",
+    "options": [
+      "Browser-based sessions require separate browser data controls/DLP policies, not only network security rules",
+      "QoS is overriding the block",
+      "BGP is misconfigured",
+      "Service connections are down"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Prisma Browser has its own data controls. Network rules alone may not control the in-browser UX (uploads/downloads/clipboard) unless browser controls are configured.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Multitenancy, RBAC & Governance",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 18,
+    "topic": "Identity",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer configures a rule to allow Developers to access a private Git server. Some users in that group are denied. In identity logs, they authenticate but group membership is missing. What is the most likely root cause? The scenario is occurring in a production rollout where changes must be targeted and low-risk. Use the option that best reflects first-principles troubleshooting and correct feature intent.",
+    "options": [
+      "URL filtering override",
+      "Identity source group/attribute mapping issue (e.g., directory sync/attribute scope)",
+      "IPsec MTU",
+      "QoS classification"
+    ],
+    "correct": [
+      1
+    ],
+    "explanation": "If authentication succeeds but group membership is absent, the issue is typically directory/group attribute mapping or sync/attribute scope.",
+    "domain": "Prisma Access Troubleshooting",
+    "subcategory": "Identity & Authentication",
+    "exam_domain": "Troubleshooting"
+  },
+  {
+    "id": 19,
+    "topic": "Split Tunnel",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer wants to avoid sending all internet traffic through tunnels for performance, but still wants private app access through Prisma Access. Which is the best high-level approach? The scenario is occurring in a production rollout where changes must be targeted and low-risk. Use the option that best reflects first-principles troubleshooting and correct feature intent.",
+    "options": [
+      "Split tunnel internet traffic; keep private app routes through Prisma Access",
+      "Force all traffic through Service Connection",
+      "Use Explicit Proxy for private apps",
+      "Disable routing and rely on DNS"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "A common approach is local breakout for internet and tunneling private app prefixes through Prisma Access (or via ZTNA/private access), preserving private access while reducing internet hairpin.",
+    "domain": "Prisma Access Planning & Deployment",
+    "subcategory": "Private App Access (ZTNA)",
+    "exam_domain": "Planning & Deployment"
+  },
+  {
+    "id": 20,
+    "topic": "Routing",
+    "type": "single",
+    "selectCount": null,
+    "question": "Users complain that one private app works from HQ but not from Remote Networks. HQ accesses via Service Connection. Remote Networks have their own tunnels. What is the best first hypothesis? The customer has redundant underlay links and expects deterministic private-app reachability. Monitoring shows the tunnel state remains healthy, but application reachability changes over time. Assume firewall rules on the private side are unchanged since last known-good.",
+    "options": [
+      "The private app is published only through the SC path and Remote Networks lack route/permit to that destination",
+      "URL filtering blocks Remote Networks by default",
+      "QoS blocks Remote Networks by default",
+      "RBI must be enabled for Remote Networks"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Differences between MU/RN/SC paths often come down to routing reachability and policy scope (source zones). Validate that RNs are permitted and have correct routes to the app.",
+    "domain": "Prisma Access Troubleshooting",
+    "subcategory": "Private App Access (ZTNA)",
+    "exam_domain": "Troubleshooting"
+  },
+  {
+    "id": 21,
+    "topic": "Browser Controls",
+    "type": "single",
+    "selectCount": null,
+    "question": "A company rolls out Prisma Browser for BYOD. They want: prevent copy/paste out of the session, block downloads, and restrict uploads to only sanctioned apps. Which control area is most relevant? The organization is using a browser-based approach specifically to avoid granting full network access to unmanaged devices. Users are successfully authenticating, but the behavior differs between managed (full client) and unmanaged (browser) access paths. You need the most likely explanation or next check consistent with least-privilege design.",
+    "options": [
+      "Browser data controls / DLP controls",
+      "BGP route filtering",
+      "IPsec transform set",
+      "Routing preference"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "These are browser-session data controls (clipboard/download/upload restrictions) rather than network routing constructs.",
+    "domain": "Prisma Access Services",
+    "subcategory": "Browser-Based Access & RBI",
+    "exam_domain": "Prisma Browser"
+  },
+  {
+    "id": 22,
+    "topic": "Private App Access",
+    "type": "single",
+    "selectCount": null,
+    "question": "A BYOD user can open the Prisma Browser session but cannot reach intranet.corp.local. Managed devices via Mobile User VPN can. What is the best next step? The rollout is managed through centralized policy, and users authenticate via enterprise SSO. The issue is repeatable across multiple devices, and security policy is confirmed identical across regions/tenants. You are asked to identify the most likely design/config cause before making broad changes.",
+    "options": [
+      "Verify private app connectivity path for Prisma Browser (connector/tunnel/service connection) and entitlements for that app",
+      "Disable URL filtering",
+      "Disable QoS",
+      "Change certificate authority"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Prisma Browser private app access depends on proper private connectivity (connector/SC) plus correct entitlements for the user/app.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Multitenancy, RBAC & Governance",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 23,
+    "topic": "Authentication",
+    "type": "single",
+    "selectCount": null,
+    "question": "A company wants to enforce the same user authentication experience for Prisma Browser as their enterprise apps. What is the most typical integration? The organization is using a browser-based approach specifically to avoid granting full network access to unmanaged devices. Users are successfully authenticating, but the behavior differs between managed (full client) and unmanaged (browser) access paths. You need the most likely explanation or next check consistent with least-privilege design.",
+    "options": [
+      "SAML with enterprise IdP",
+      "Local user database only",
+      "Static IP allowlisting",
+      "FTP authentication"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Enterprise SSO commonly uses SAML with an IdP to deliver consistent authentication and group claims.",
+    "domain": "Prisma Access Services",
+    "subcategory": "Browser-Based Access & RBI",
+    "exam_domain": "Prisma Browser"
+  },
+  {
+    "id": 24,
+    "topic": "URL Categories",
+    "type": "single",
+    "selectCount": null,
+    "question": "A security team enables RBI for \"unknown\" categories only. Users report banking sites now open inside isolation unexpectedly. What is the most likely misconfiguration? The customer has redundant underlay links and expects deterministic private-app reachability. Monitoring shows the tunnel state remains healthy, but application reachability changes over time. Assume firewall rules on the private side are unchanged since last known-good.",
+    "options": [
+      "URL categories for banking are misclassified/overlapping with \"unknown\" in policy order",
+      "QoS is misconfigured",
+      "Service connection is down",
+      "IPsec lifetimes are too short"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "If banking is being isolated unexpectedly, validate classification and policy order (a broader category/rule may be matching first).",
+    "domain": "Prisma Access Services",
+    "subcategory": "Browser-Based Access & RBI",
+    "exam_domain": "Prisma Browser"
+  },
+  {
+    "id": 25,
+    "topic": "Data Leakage",
+    "type": "multi",
+    "selectCount": 2,
+    "question": "A Prisma Browser rollout requires reducing data leakage risk from unmanaged devices. (Choose two) Which two controls help most directly? The organization is using a browser-based approach specifically to avoid granting full network access to unmanaged devices. Users are successfully authenticating, but the behavior differs between managed (full client) and unmanaged (browser) access paths. You need the most likely explanation or next check consistent with least-privilege design.",
+    "options": [
+      "Download/upload restrictions",
+      "Clipboard controls",
+      "OSPF route redistribution",
+      "IPsec Phase 1 hash algorithm"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "Download/upload and clipboard controls directly reduce data exfiltration vectors in browser sessions.",
+    "domain": "Prisma Access Services",
+    "subcategory": "Browser-Based Access & RBI",
+    "exam_domain": "Prisma Browser"
+  },
+  {
+    "id": 26,
+    "topic": "BYOD Access",
+    "type": "single",
+    "selectCount": null,
+    "question": "A company wants browser-only access so BYOD never gets L3 access to internal subnets, only to specific apps. Which statement is most accurate? The organization is using a browser-based approach specifically to avoid granting full network access to unmanaged devices. Users are successfully authenticating, but the behavior differs between managed (full client) and unmanaged (browser) access paths. You need the most likely explanation or next check consistent with least-privilege design.",
+    "options": [
+      "Browser-based access can reduce exposure by limiting access to applications instead of network segments",
+      "Browser-based access always requires full L3 VPN access",
+      "Browser-based access disables all inspection",
+      "Browser-based access cannot use identity"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Browser-based app access is often used to avoid granting broad network access on unmanaged devices.",
+    "domain": "Prisma Access Services",
+    "subcategory": "Browser-Based Access & RBI",
+    "exam_domain": "Prisma Browser"
+  },
+  {
+    "id": 27,
+    "topic": "DLP Enforcement",
+    "type": "single",
+    "selectCount": null,
+    "question": "Users report that only in Prisma Browser sessions, uploads of a file containing SSNs are blocked. In normal managed device browsing, uploads succeed. The company expects SSNs blocked everywhere. What's the best explanation? The organization is using a browser-based approach specifically to avoid granting full network access to unmanaged devices. Users are successfully authenticating, but the behavior differs between managed (full client) and unmanaged (browser) access paths. You need the most likely explanation or next check consistent with least-privilege design.",
+    "options": [
+      "DLP is enabled for browser sessions but not enabled/enforced on the network path used by managed browsing",
+      "QoS is blocking SSNs",
+      "BGP prefers browser routes",
+      "IPsec rekeys block SSNs"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Different access paths can have different controls attached. If DLP is only applied to Prisma Browser traffic, managed browsing may bypass DLP enforcement unless configured there too.",
+    "domain": "Prisma Access Services",
+    "subcategory": "Browser-Based Access & RBI",
+    "exam_domain": "Prisma Browser"
+  },
+  {
+    "id": 28,
+    "topic": "Entitlements",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer secures an internal app via Prisma Browser private app access. Some users authenticate but get \"Not authorized.\" What is the most likely cause? The organization is using a browser-based approach specifically to avoid granting full network access to unmanaged devices. Users are successfully authenticating, but the behavior differs between managed (full client) and unmanaged (browser) access paths. You need the most likely explanation or next check consistent with least-privilege design.",
+    "options": [
+      "The application entitlement policy/group membership doesn't include those users",
+      "URL filtering database is stale",
+      "Decryption is off",
+      "MTU mismatch"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "\"Not authorized\" typically indicates entitlement/authorization mismatch rather than routing.",
+    "domain": "Prisma Access Troubleshooting",
+    "subcategory": "Browser-Based Access & RBI",
+    "exam_domain": "Prisma Browser"
+  },
+  {
+    "id": 29,
+    "topic": "Multitenancy",
+    "type": "single",
+    "selectCount": null,
+    "question": "A company uses multitenancy and wants each region to manage its own policies, but security wants a global baseline that cannot be overridden. What is the best approach? Administration is split between a central security team and delegated regional admins. The environment uses shared/baseline objects where appropriate, and scope/attachment determines enforcement. The goal is to resolve the issue while preserving separation of duties.",
+    "options": [
+      "Put everything into child tenants only",
+      "Use parent/global tenant for baseline rules and restrict child tenant permissions with RBAC and policy structure",
+      "Disable multitenancy",
+      "Give every admin superuser"
+    ],
+    "correct": [
+      1
+    ],
+    "explanation": "A parent/baseline layer plus RBAC is the standard pattern to enforce global controls while allowing local administration.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Multitenancy, RBAC & Governance",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 30,
+    "topic": "RBAC",
+    "type": "single",
+    "selectCount": null,
+    "question": "A junior admin accidentally modified a critical rule. The company wants to prevent this and support audits. Which operational control best addresses it? The SOC relies on centralized logging for investigations, and the question focuses on the most direct reason logs are missing or what to validate first. Assume network reachability exists unless the scenario states otherwise.",
+    "options": [
+      "RBAC with least privilege + separation of duties + change management/versioning",
+      "Increase QoS priority",
+      "Disable decryption",
+      "Change compute location"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Least privilege and change control (including audit trails/versioning) are core operational protections.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Logging, Visibility & Operations",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 31,
+    "topic": "Logging",
+    "type": "single",
+    "selectCount": null,
+    "question": "A security lead asks: \"Which rule matched this traffic, and why was it allowed?\" What is the best artifact to check first? The scenario is occurring in a production rollout where changes must be targeted and low-risk. Use the option that best reflects first-principles troubleshooting and correct feature intent.",
+    "options": [
+      "Traffic logs showing rule match, application, user, and action",
+      "BGP route table only",
+      "IPsec Phase 1 proposal only",
+      "DNS cache"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Traffic logs typically record the rule matched and action taken, plus key context like application and user.",
+    "domain": "Prisma Access Troubleshooting",
+    "subcategory": "Security Enforcement & Inspection",
+    "exam_domain": "Troubleshooting"
+  },
+  {
+    "id": 32,
+    "topic": "Centralized Logging",
+    "type": "single",
+    "selectCount": null,
+    "question": "A company wants centralized logging for analysis and troubleshooting across all tenants. What is the primary reason to use a centralized logging service? Administration is split between a central security team and delegated regional admins. The environment uses shared/baseline objects where appropriate, and scope/attachment determines enforcement. The goal is to resolve the issue while preserving separation of duties.",
+    "options": [
+      "To replace security policies",
+      "To store and query logs consistently for visibility and troubleshooting",
+      "To provide end-user VPN tunnels",
+      "To replace DNS"
+    ],
+    "correct": [
+      1
+    ],
+    "explanation": "Centralized logging enables consistent visibility, investigations, and cross-tenant reporting.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Logging, Visibility & Operations",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 33,
+    "topic": "Go-Live Review",
+    "type": "multi",
+    "selectCount": 2,
+    "question": "An admin is preparing for a go-live review. They want to verify deployment posture and configuration hygiene. (Choose two) Which two are best aligned? The scenario is occurring in a production rollout where changes must be targeted and low-risk. Use the option that best reflects first-principles troubleshooting and correct feature intent.",
+    "options": [
+      "Best Practice Assessment (BPA) / best-practice checks",
+      "Review decryption exclusions and document rationale",
+      "Change all tunnels to static routes only",
+      "Disable logging to reduce noise"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "Go-live readiness includes best-practice checks and clear, justified decryption scope/exclusions—not removing routing dynamics or disabling logs.",
+    "domain": "Prisma Access Services",
+    "subcategory": "Security Enforcement & Inspection",
+    "exam_domain": "Prisma Access Services"
+  },
+  {
+    "id": 34,
+    "topic": "RBAC",
+    "type": "single",
+    "selectCount": null,
+    "question": "An org wants to ensure only specific admins can manage decryption policies while others can manage URL filtering. What is the best mechanism? The scenario is occurring in a production rollout where changes must be targeted and low-risk. Use the option that best reflects first-principles troubleshooting and correct feature intent.",
+    "options": [
+      "RBAC with role separation",
+      "Routing preference",
+      "QoS",
+      "Split tunnel"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "RBAC with role separation enforces least privilege at the admin-plane level.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Multitenancy, RBAC & Governance",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 35,
+    "topic": "Change Management",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer wants consistent workflow and minimum disruption. What is the best operational practice before pushing major changes? The scenario is occurring in a production rollout where changes must be targeted and low-risk. Use the option that best reflects first-principles troubleshooting and correct feature intent.",
+    "options": [
+      "Validate/commit in a controlled window, ensure rollback/versioning and monitoring plans",
+      "Push changes during peak hours to observe behavior quickly",
+      "Disable identity to reduce complexity",
+      "Disable decryption to reduce risk"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Major changes should be validated, scheduled, monitored, and rollback-capable.",
+    "domain": "Prisma Access Troubleshooting",
+    "subcategory": "Security Enforcement & Inspection",
+    "exam_domain": "Troubleshooting"
+  },
+  {
+    "id": 36,
+    "topic": "Troubleshooting",
+    "type": "single",
+    "selectCount": null,
+    "question": "A Mobile User shows \"Connected\" but cannot reach any private apps. Internet works. What is the best next troubleshooting step? The rollout is managed through centralized policy, and users authenticate via enterprise SSO. The issue is repeatable across multiple devices, and security policy is confirmed identical across regions/tenants. You are asked to identify the most likely design/config cause before making broad changes.",
+    "options": [
+      "Verify the private app path: routes to private prefixes + service connection/connector status + policy permitting the app",
+      "Immediately disable all threat profiles",
+      "Change URL category database",
+      "Disable QoS"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "If internet works but private apps fail, focus on private app reachability: routes, SC/connector health, and policy/entitlements.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Multitenancy, RBAC & Governance",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 37,
+    "topic": "Remote Networks",
+    "type": "single",
+    "selectCount": null,
+    "question": "A Remote Network site can reach private apps, but cannot reach the internet through Prisma Access. Tunnel is up. Which is the best first check? The site reports the tunnel status as established, and basic pings may succeed intermittently. The change window was recent, and the operations team wants the first check that most quickly narrows root cause. Assume endpoints and application servers are up.",
+    "options": [
+      "Verify remote network egress policy/NAT for internet and whether default route/egress is configured for that RN",
+      "Disable DLP",
+      "Add decryption exclusions",
+      "Change IdP settings"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Internet egress for an RN depends on correct default route/egress/NAT policies. Tunnel up alone doesn't ensure internet egress is configured.",
+    "domain": "Prisma Access Troubleshooting",
+    "subcategory": "Private App Access (ZTNA)",
+    "exam_domain": "Troubleshooting"
+  },
+  {
+    "id": 38,
+    "topic": "App-ID",
+    "type": "single",
+    "selectCount": null,
+    "question": "Users complain that after a policy update, one app is blocked only for a subset of users. Logs show rule \"Block-Unknown\" matches instead of \"Allow-AppX.\" What is the most likely cause? The scenario is occurring in a production rollout where changes must be targeted and low-risk. Use the option that best reflects first-principles troubleshooting and correct feature intent.",
+    "options": [
+      "App-ID not identified (falls back to unknown) or decryption changed visibility, causing different app classification",
+      "QoS changed the rule order",
+      "BGP communities changed user groups",
+      "Service connections removed URL categories"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "If traffic matches a block-unknown rule, either the application is not identified as expected or visibility changed (often via decryption), shifting classification.",
+    "domain": "Prisma Access Troubleshooting",
+    "subcategory": "Connectivity & Routing",
+    "exam_domain": "Troubleshooting"
+  },
+  {
+    "id": 39,
+    "topic": "Latency",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer sees increased latency for a specific private application from APAC users only. Internet traffic is fine. Which is the best hypothesis to test first? The scenario is occurring in a production rollout where changes must be targeted and low-risk. Use the option that best reflects first-principles troubleshooting and correct feature intent.",
+    "options": [
+      "APAC users are taking a suboptimal path to the private network (compute location/service connection geography/routing preference)",
+      "URL filtering database is stale in APAC only",
+      "Clipboard controls add latency",
+      "HIP checks slow down DNS"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Geo-specific private-app latency frequently traces to compute/SC placement and routing/path selection.",
+    "domain": "Prisma Access Troubleshooting",
+    "subcategory": "Private App Access (ZTNA)",
+    "exam_domain": "Troubleshooting"
+  },
+  {
+    "id": 40,
+    "topic": "Split Tunnel",
+    "type": "single",
+    "selectCount": null,
+    "question": "A user reports that certain domains bypass the tunnel after split tunneling changes. What is the fastest endpoint-side confirmation? The scenario is occurring in a production rollout where changes must be targeted and low-risk. Use the option that best reflects first-principles troubleshooting and correct feature intent.",
+    "options": [
+      "Check endpoint effective routes/routing table and DNS resolution behavior for those domains",
+      "Change compute location",
+      "Rotate certificates",
+      "Disable User-ID"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Split tunneling is verified quickest by checking effective routes (and sometimes DNS behavior) on the endpoint.",
+    "domain": "Prisma Access Troubleshooting",
+    "subcategory": "Mobile Users & Endpoint Access",
+    "exam_domain": "Troubleshooting"
+  },
+  {
+    "id": 41,
+    "topic": "DNS",
+    "type": "single",
+    "selectCount": null,
+    "question": "A private app is reachable by IP but not by FQDN for Mobile Users. What is the best first check? The rollout is managed through centralized policy, and users authenticate via enterprise SSO. The issue is repeatable across multiple devices, and security policy is confirmed identical across regions/tenants. You are asked to identify the most likely design/config cause before making broad changes.",
+    "options": [
+      "DNS resolution path (DNS settings, internal DNS reachability via SC, and split-tunnel DNS behavior)",
+      "QoS policy",
+      "RBI policy",
+      "IPsec Phase 1 proposal"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "IP reachable but FQDN not usually indicates DNS resolution problems: which DNS server is used and whether internal DNS is reachable.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Multitenancy, RBAC & Governance",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 42,
+    "topic": "Policy Enforcement",
+    "type": "multi",
+    "selectCount": 2,
+    "question": "A \"policy not enforcing\" ticket comes in: user claims blocked category sites are accessible. (Choose two) Which two are best first validations? The scenario is occurring in a production rollout where changes must be targeted and low-risk. Use the option that best reflects first-principles troubleshooting and correct feature intent.",
+    "options": [
+      "Confirm user identity/group mapping for that session",
+      "Confirm which security rule matched in traffic logs and whether URL filtering profile is attached",
+      "Tune IPsec lifetimes",
+      "Change BGP hold timers"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "Validate who the user is (and group membership), and validate the rule match and profile attachment in logs. Routing timers rarely explain category blocks not applying.",
+    "domain": "Prisma Access Troubleshooting",
+    "subcategory": "Security Enforcement & Inspection",
+    "exam_domain": "Troubleshooting"
+  },
+  {
+    "id": 43,
+    "topic": "BGP",
+    "type": "single",
+    "selectCount": null,
+    "question": "A service connection is up, but private routes are missing in Prisma Access. Which is the most likely category of issue? The customer has redundant underlay links and expects deterministic private-app reachability. Monitoring shows the tunnel state remains healthy, but application reachability changes over time. Assume firewall rules on the private side are unchanged since last known-good.",
+    "options": [
+      "Route exchange (BGP) not established / route filters preventing advertisement",
+      "URL filtering is off",
+      "QoS is off",
+      "RBI is off"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Missing routes indicate control-plane route exchange/filtering issues, not content security features.",
+    "domain": "Prisma Access Planning & Deployment",
+    "subcategory": "Private App Access (ZTNA)",
+    "exam_domain": "Planning & Deployment"
+  },
+  {
+    "id": 44,
+    "topic": "Decryption",
+    "type": "single",
+    "selectCount": null,
+    "question": "After enabling decryption, users report some SaaS apps prompt for repeated login. Security wants decryption to remain enabled. What is the most appropriate next action? The scenario is occurring in a production rollout where changes must be targeted and low-risk. Use the option that best reflects first-principles troubleshooting and correct feature intent.",
+    "options": [
+      "Create targeted decryption exclusions for the affected SaaS endpoints and verify security compensations",
+      "Disable all authentication",
+      "Disable URL filtering",
+      "Move all users to a single compute location"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Some SaaS flows can be sensitive under decryption. The typical remediation is targeted no-decrypt for those endpoints while keeping decryption broadly enabled.",
+    "domain": "Prisma Access Services",
+    "subcategory": "Data Security (DLP / SaaS / AI / IoT)",
+    "exam_domain": "Prisma Access Services"
+  },
+  {
+    "id": 45,
+    "topic": "Multitenancy",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer uses tenant A and tenant B. A shared service connection exists in the parent. Tenant B cannot reach any private apps, Tenant A can. What is the most likely cause? The customer has redundant underlay links and expects deterministic private-app reachability. Monitoring shows the tunnel state remains healthy, but application reachability changes over time. Assume firewall rules on the private side are unchanged since last known-good.",
+    "options": [
+      "Tenant B lacks route import/visibility or policy that permits private prefixes through the shared SC scope",
+      "QoS mislabels Tenant B only",
+      "IPsec is down for Tenant B only (impossible with shared SC)",
+      "TLS certificates differ per tenant"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "With shared SC, per-tenant reachability differences usually come from scope/route visibility and policy permissions, not tunnel state.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Multitenancy, RBAC & Governance",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 46,
+    "topic": "Prisma Browser",
+    "type": "single",
+    "selectCount": null,
+    "question": "A Prisma Browser user can access public internet but not private apps. Mobile User VPN users can access private apps. Which is the best next step? The rollout is managed through centralized policy, and users authenticate via enterprise SSO. The issue is repeatable across multiple devices, and security policy is confirmed identical across regions/tenants. You are asked to identify the most likely design/config cause before making broad changes.",
+    "options": [
+      "Verify Prisma Browser private app connectivity (connector/SC path) + entitlement rules for that app",
+      "Disable URL filtering",
+      "Increase QoS for web traffic",
+      "Disable decryption globally"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Prisma Browser private app access depends on correct private connectivity and entitlements; success on MU VPN doesn't prove the browser path is configured.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Multitenancy, RBAC & Governance",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 47,
+    "topic": "DLP",
+    "type": "single",
+    "selectCount": null,
+    "question": "A security team expects DLP to block uploads containing credit card numbers. A user uploads a CSV with test card numbers to a personal site and it succeeds. What is the best first check? The security team expects policy enforcement based on content inspection, and they need auditability in logs for compliance. Assume the user is not using an alternative network path unless stated, and focus on the most probable control-plane/data-plane reason.",
+    "options": [
+      "Confirm the traffic path is actually inspected by DLP policy (correct rule attachment/scope) and that decryption is enabled where needed",
+      "Increase IPsec lifetimes",
+      "Enable RBI",
+      "Change compute location"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "DLP generally needs to be attached on the active rule path, and many content inspections require decryption. Verify both before changing other components.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Logging, Visibility & Operations",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 48,
+    "topic": "Identity",
+    "type": "single",
+    "selectCount": null,
+    "question": "A company uses identity-based policy. Suddenly many sessions show user as \"unknown,\" and rules fall back to IP-based matching. What is the most likely cause? The scenario is occurring in a production rollout where changes must be targeted and low-risk. Use the option that best reflects first-principles troubleshooting and correct feature intent.",
+    "options": [
+      "Identity provider / mapping service disruption or misconfiguration causing user/group mapping failures",
+      "QoS queue overflow",
+      "BGP neighbor down",
+      "Decryption certificate expired (always)"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "A broad shift to user=unknown typically indicates identity mapping/IdP issues rather than QoS/BGP.",
+    "domain": "Prisma Access Troubleshooting",
+    "subcategory": "Identity & Authentication",
+    "exam_domain": "Troubleshooting"
+  },
+  {
+    "id": 49,
+    "topic": "Change Management",
+    "type": "multi",
+    "selectCount": 2,
+    "question": "A customer wants to reduce blast radius and simplify troubleshooting. They plan to roll out changes in phases. (Choose two) Which two practices best support this? The site reports the tunnel status as established, and basic pings may succeed intermittently. The change window was recent, and the operations team wants the first check that most quickly narrows root cause. Assume endpoints and application servers are up.",
+    "options": [
+      "Use pilot groups/limited scope changes and monitor logs before expanding",
+      "Maintain config versioning/rollback readiness",
+      "Disable logging for performance",
+      "Force all traffic through one region to reduce variables"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "Phased rollouts use limited scope + monitoring and rely on rollback readiness. Disabling logs is counterproductive; forcing all traffic through one region can create new risk/latency.",
+    "domain": "Prisma Access Planning & Deployment",
+    "subcategory": "Mobile Users & Endpoint Access",
+    "exam_domain": "Planning & Deployment"
+  },
+  {
+    "id": 50,
+    "topic": "Private Apps",
+    "type": "single",
+    "selectCount": null,
+    "question": "A user can access private app A but not private app B. Both are behind the same service connection. Logs show \"deny\" for app B with rule \"Private-Apps-Deny.\" What is the most likely correct next action? The customer has redundant underlay links and expects deterministic private-app reachability. Monitoring shows the tunnel state remains healthy, but application reachability changes over time. Assume firewall rules on the private side are unchanged since last known-good.",
+    "options": [
+      "Update the security rulebase/entitlements to allow app B for the user/group and validate app definition (FQDN/port)",
+      "Change IPsec Phase 1 proposal",
+      "Disable QoS",
+      "Enable RBI"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "A deny by a specific private-app rule indicates policy/entitlements/app definition need adjustment; tunnel parameters or QoS won't fix a deliberate deny.",
+    "domain": "Prisma Access Planning & Deployment",
+    "subcategory": "Private App Access (ZTNA)",
+    "exam_domain": "Planning & Deployment"
+  },
+  {
+    "id": 51,
+    "topic": "Colo-Connect",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer has a high-throughput private app in a colocation facility and wants the lowest latency path from Prisma Access to that colo with minimal internet underlay variability. They already have redundant providers into the colo. Which connectivity choice is most appropriate? The scenario is occurring in a production rollout where changes must be targeted and low-risk. Use the option that best reflects first-principles troubleshooting and correct feature intent.",
+    "options": [
+      "Only Remote Networks from the colo",
+      "Colo-Connect for deterministic performance to the colo",
+      "Explicit Proxy with PAC file from the colo",
+      "RBI for all private app sessions"
+    ],
+    "correct": [
+      1
+    ],
+    "explanation": "Colo-Connect is intended for high-performance, predictable connectivity between Prisma Access and colocation environments (where available), reducing underlay variability compared with internet-only tunnels.",
+    "domain": "Prisma Access Planning & Deployment",
+    "subcategory": "Private App Access (ZTNA)",
+    "exam_domain": "Planning & Deployment"
+  },
+  {
+    "id": 52,
+    "topic": "Routing",
+    "type": "single",
+    "selectCount": null,
+    "question": "A mobile user can reach the internet but cannot reach any private apps. Service Connections are healthy. You suspect the user is not receiving private routes. What is the most direct endpoint-side confirmation? The rollout is managed through centralized policy, and users authenticate via enterprise SSO. The issue is repeatable across multiple devices, and security policy is confirmed identical across regions/tenants. You are asked to identify the most likely design/config cause before making broad changes.",
+    "options": [
+      "Check the endpoint effective routes / route table and look for private prefixes",
+      "Change URL filtering profile",
+      "Disable QoS",
+      "Rotate the decryption certificate"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "If private routes are missing on the endpoint, the user won't send private-prefix traffic into the tunnel. Checking effective routes is the fastest confirmation.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Multitenancy, RBAC & Governance",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 53,
+    "topic": "Security Policy",
+    "type": "single",
+    "selectCount": null,
+    "question": "A branch site is onboarded as a Remote Network. Internet access works. Private apps behind a Service Connection fail only from that branch. Routing table shows the private prefix exists. What is the best next hypothesis? The customer has redundant underlay links and expects deterministic private-app reachability. Monitoring shows the tunnel state remains healthy, but application reachability changes over time. Assume firewall rules on the private side are unchanged since last known-good.",
+    "options": [
+      "Security policy differs by source (Remote Networks vs Mobile Users) and is denying the branch source zone/segment",
+      "URL category database is stale at that branch",
+      "QoS is dropping private routes",
+      "RBI is required for private apps"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "If routes exist but access fails only from one source type, the next suspect is policy scope/zone/source differences for Remote Networks vs other sources.",
+    "domain": "Prisma Access Planning & Deployment",
+    "subcategory": "Private App Access (ZTNA)",
+    "exam_domain": "Planning & Deployment"
+  },
+  {
+    "id": 54,
+    "topic": "ZTNA Connector",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer deploys a ZTNA Connector for private app access from Prisma Access. The connector shows \"connected,\" but users get \"app unreachable.\" What is the best first check? The scenario is occurring in a production rollout where changes must be targeted and low-risk. Use the option that best reflects first-principles troubleshooting and correct feature intent.",
+    "options": [
+      "Confirm the connector can resolve and reach the private app internally (DNS + routing + local firewall)",
+      "Disable TLS decryption globally",
+      "Move the connector to a different region",
+      "Enable QoS priority for the connector"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Connector health doesn't guarantee app reachability. Validate DNS resolution and reachability from the connector's network to the app (including firewall rules).",
+    "domain": "Prisma Access Planning & Deployment",
+    "subcategory": "Private App Access (ZTNA)",
+    "exam_domain": "Planning & Deployment"
+  },
+  {
+    "id": 55,
+    "topic": "App Definition",
+    "type": "single",
+    "selectCount": null,
+    "question": "A ZTNA Connector is healthy, but only one private app fails and only on port 8443. The same app works on 443. What is the most likely cause? The scenario is occurring in a production rollout where changes must be targeted and low-risk. Use the option that best reflects first-principles troubleshooting and correct feature intent.",
+    "options": [
+      "The app definition/entitlement does not include the correct port, or the internal firewall blocks that port",
+      "URL filtering blocks 8443 by default",
+      "QoS does not support 8443",
+      "TLS decryption can't inspect 8443"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Port-specific failures typically come from app definition/entitlement not including that port or internal network firewalling—not URL filtering or QoS.",
+    "domain": "Prisma Access Troubleshooting",
+    "subcategory": "Private App Access (ZTNA)",
+    "exam_domain": "Troubleshooting"
+  },
+  {
+    "id": 56,
+    "topic": "Remote Networks",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer wants to onboard 60 branch sites quickly with minimal device changes. They prefer network tunnel onboarding and central policy enforcement, not per-browser config. Which approach best fits? The organization is using a browser-based approach specifically to avoid granting full network access to unmanaged devices. Users are successfully authenticating, but the behavior differs between managed (full client) and unmanaged (browser) access paths. You need the most likely explanation or next check consistent with least-privilege design.",
+    "options": [
+      "Explicit Proxy with PAC file",
+      "Remote Network IPsec onboarding",
+      "Prisma Browser only",
+      "RBI only"
+    ],
+    "correct": [
+      1
+    ],
+    "explanation": "Remote Network IPsec onboarding provides site-to-cloud tunnel connectivity with centralized policy enforcement for branch networks.",
+    "domain": "Prisma Access Planning & Deployment",
+    "subcategory": "Mobile Users & Endpoint Access",
+    "exam_domain": "Planning & Deployment"
+  },
+  {
+    "id": 57,
+    "topic": "DNS",
+    "type": "multi",
+    "selectCount": 2,
+    "question": "A troubleshooting case: \"private app works by IP but not by hostname\" for both Mobile Users and Prisma Browser. (Choose two) Which two checks are most relevant? The rollout is managed through centralized policy, and users authenticate via enterprise SSO. The issue is repeatable across multiple devices, and security policy is confirmed identical across regions/tenants. You are asked to identify the most likely design/config cause before making broad changes.",
+    "options": [
+      "Internal DNS reachability (via SC/connector) and the DNS server configuration used by clients",
+      "URL filtering category for the hostname",
+      "Endpoint clipboard controls",
+      "BGP community values on the service connection"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "FQDN failures often trace to DNS. Additionally, URL/category-based policy can block by hostname even if IP access works; validate both.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Multitenancy, RBAC & Governance",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 58,
+    "topic": "AI Access Security",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer wants to stop managed endpoints from using unsanctioned AI sites and wants policy that distinguishes between allowed AI tools and blocked AI tools. Which capability is most aligned? The customer wants policy that differentiates between allowed and disallowed AI tools, with minimal false positives. They prefer targeted refinements over broad rollbacks.",
+    "options": [
+      "AI Access Security controls",
+      "QoS",
+      "IPsec rekey tuning",
+      "Remote Browser Isolation only"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "AI Access Security is designed to govern access to AI applications/services with policy distinctions across AI tools.",
+    "domain": "Prisma Access Services",
+    "subcategory": "Data Security (DLP / SaaS / AI / IoT)",
+    "exam_domain": "Prisma Access Services"
+  },
+  {
+    "id": 59,
+    "topic": "AI Access Security",
+    "type": "single",
+    "selectCount": null,
+    "question": "After enabling AI Access Security, users complain the policy blocks a legitimate AI tool intermittently. Logs show requests categorized inconsistently. What is the best next action? The customer wants policy that differentiates between allowed and disallowed AI tools, with minimal false positives. They prefer targeted refinements over broad rollbacks.",
+    "options": [
+      "Validate AI app classification signals and adjust policy with explicit allowlist/exception + monitoring before broad rollback",
+      "Disable all URL filtering",
+      "Disable all identity mapping",
+      "Force a single compute location"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Intermittent classification issues are best handled by validating detection/classification and adding explicit policy exceptions/allowlists while monitoring outcomes.",
+    "domain": "Prisma Access Troubleshooting",
+    "subcategory": "Data Security (DLP / SaaS / AI / IoT)",
+    "exam_domain": "Troubleshooting"
+  },
+  {
+    "id": 60,
+    "topic": "IoT Security",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer needs to identify and segment IoT devices at branches and apply stricter policy for unknown IoT device types. Which service best matches? The customer expects device identification to improve over time as telemetry and visibility increase. They want the most likely explanation that aligns with how IoT classification typically works.",
+    "options": [
+      "IoT Security",
+      "App Acceleration",
+      "RBI",
+      "Decryption exclusions"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "IoT Security focuses on device discovery/classification and enabling policy decisions around IoT device types and risk.",
+    "domain": "Prisma Access Services",
+    "subcategory": "Data Security (DLP / SaaS / AI / IoT)",
+    "exam_domain": "Prisma Access Services"
+  },
+  {
+    "id": 61,
+    "topic": "IoT Security",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer enables IoT Security visibility but sees many devices as \"unknown.\" What is the best first hypothesis? The customer expects device identification to improve over time as telemetry and visibility increase. They want the most likely explanation that aligns with how IoT classification typically works.",
+    "options": [
+      "Insufficient device telemetry/classification signals or incomplete traffic visibility (e.g., bypassed inspection path)",
+      "QoS is blocking discovery",
+      "IPsec Phase 1 mismatch",
+      "Decryption is required for ARP"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "High \"unknown\" rates usually mean insufficient data for classification or gaps in observed traffic/telemetry.",
+    "domain": "Prisma Access Troubleshooting",
+    "subcategory": "Data Security (DLP / SaaS / AI / IoT)",
+    "exam_domain": "Troubleshooting"
+  },
+  {
+    "id": 62,
+    "topic": "Privileged Remote Access",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer wants admin access into servers controlled with approval workflows and strong session controls (recording/least privilege). Which capability best aligns? The scenario is occurring in a production rollout where changes must be targeted and low-risk. Use the option that best reflects first-principles troubleshooting and correct feature intent.",
+    "options": [
+      "Privileged Remote Access",
+      "Traffic replication",
+      "QoS",
+      "Split tunneling"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Privileged Remote Access is intended to manage privileged sessions with strong controls (approval, recording, least privilege).",
+    "domain": "Prisma Access Troubleshooting",
+    "subcategory": "Security Enforcement & Inspection",
+    "exam_domain": "Troubleshooting"
+  },
+  {
+    "id": 63,
+    "topic": "Privileged Remote Access",
+    "type": "single",
+    "selectCount": null,
+    "question": "A Privileged Remote Access policy is configured but users say \"I can reach the jump host, but I don't see the target systems.\" What is the best next check? The scenario is occurring in a production rollout where changes must be targeted and low-risk. Use the option that best reflects first-principles troubleshooting and correct feature intent.",
+    "options": [
+      "Verify entitlements/role mapping for target resources and the connector path to those targets",
+      "Disable URL filtering",
+      "Increase BGP hold timers",
+      "Disable DLP"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "If the jump host is reachable but targets aren't visible, validate authorization/entitlements and the network path from the access plane to targets.",
+    "domain": "Prisma Access Troubleshooting",
+    "subcategory": "Private App Access (ZTNA)",
+    "exam_domain": "Troubleshooting"
+  },
+  {
+    "id": 64,
+    "topic": "Policy Hierarchy",
+    "type": "single",
+    "selectCount": null,
+    "question": "A company uses multitenancy. Security creates a baseline \"Block High-Risk Categories\" in the parent. A child tenant admin creates an \"Allow All Web\" rule and suddenly risky sites are accessible. What is the best corrective design? Administration is split between a central security team and delegated regional admins. The environment uses shared/baseline objects where appropriate, and scope/attachment determines enforcement. The goal is to resolve the issue while preserving separation of duties.",
+    "options": [
+      "Place baseline rules in an enforced/global layer that child admins cannot override, and lock down RBAC permissions",
+      "Disable multitenancy",
+      "Remove URL filtering everywhere",
+      "Turn off identity mapping"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Preventing override requires correct policy layering/order and RBAC restrictions so local admins cannot supersede baseline controls.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Multitenancy, RBAC & Governance",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 65,
+    "topic": "Configuration Scope",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer claims \"I changed the URL Filtering profile, but nothing changed.\" You find they edited a profile in the wrong scope. What is the best explanation? The customer has redundant underlay links and expects deterministic private-app reachability. Monitoring shows the tunnel state remains healthy, but application reachability changes over time. Assume firewall rules on the private side are unchanged since last known-good.",
+    "options": [
+      "The active security rule references a different profile object in another scope (tenant vs shared)",
+      "QoS overrides URL filtering",
+      "IPsec proposal controls URL filtering",
+      "Decryption must be enabled for URL filtering to work"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Scope matters: if the enforced rule references a different profile object, changes to the wrong-scope object have no effect.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Multitenancy, RBAC & Governance",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 66,
+    "topic": "RBI",
+    "type": "single",
+    "selectCount": null,
+    "question": "A user reports: \"RBI is enabled, but I'm still getting malware downloads.\" Which is the best first check? The intent is to allow access while reducing endpoint risk exposure. Users report behavior that suggests either the wrong rule is matching or the wrong action is being taken. Pick the option that best explains the behavior without resorting to global disablement.",
+    "options": [
+      "Verify RBI is actually applied to that traffic (rule match + category + policy order) and that downloads are restricted in the correct control plane",
+      "Increase IPsec lifetimes",
+      "Disable QoS",
+      "Change compute location"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Confirm the session is truly being isolated and that download controls are enforced as intended; policy order and rule match are common culprits.",
+    "domain": "Prisma Access Troubleshooting",
+    "subcategory": "Browser-Based Access & RBI",
+    "exam_domain": "Prisma Browser"
+  },
+  {
+    "id": 67,
+    "topic": "Browser Controls",
+    "type": "multi",
+    "selectCount": 2,
+    "question": "A company wants to reduce data leakage in Prisma Browser sessions on BYOD. (Choose two) Which two controls are most directly relevant? The organization is using a browser-based approach specifically to avoid granting full network access to unmanaged devices. Users are successfully authenticating, but the behavior differs between managed (full client) and unmanaged (browser) access paths. You need the most likely explanation or next check consistent with least-privilege design.",
+    "options": [
+      "Disable/limit downloads and uploads for untrusted destinations",
+      "Clipboard controls (copy/paste)",
+      "BGP route maps",
+      "IPsec encryption domain"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "Download/upload and clipboard restrictions are direct browser-session DLP-style controls.",
+    "domain": "Prisma Access Services",
+    "subcategory": "Browser-Based Access & RBI",
+    "exam_domain": "Prisma Browser"
+  },
+  {
+    "id": 68,
+    "topic": "Connector",
+    "type": "single",
+    "selectCount": null,
+    "question": "A Prisma Browser user can access public internet but not private apps. The message shows \"Connector unavailable.\" Mobile Users can access those same apps. What is the best hypothesis? The rollout is managed through centralized policy, and users authenticate via enterprise SSO. The issue is repeatable across multiple devices, and security policy is confirmed identical across regions/tenants. You are asked to identify the most likely design/config cause before making broad changes.",
+    "options": [
+      "Prisma Browser private app access depends on a separate connector/entitlement path that isn't configured or isn't in the right scope",
+      "URL filtering blocks private apps by default",
+      "QoS blocks browser traffic by default",
+      "Decryption is mandatory for private apps"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Browser private-app access typically relies on connectors/entitlements that can be distinct from MU VPN paths; scope/attachment issues are common.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Multitenancy, RBAC & Governance",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 69,
+    "topic": "RBI",
+    "type": "single",
+    "selectCount": null,
+    "question": "A security team enables RBI for unknown categories only. After enabling both decryption and RBI, users say high-risk sites are blocked, not isolated. Most likely cause? The intent is to allow access while reducing endpoint risk exposure. Users report behavior that suggests either the wrong rule is matching or the wrong action is being taken. Pick the option that best explains the behavior without resorting to global disablement.",
+    "options": [
+      "The policy action is set to block (or the RBI rule is below a blocking rule), so isolation never triggers",
+      "Decryption prevents RBI from working",
+      "QoS disables RBI",
+      "BGP route preference blocks RBI"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "If a blocking rule matches before the RBI action (or the RBI rule itself blocks), isolation won't occur. Validate rule order and actions.",
+    "domain": "Prisma Access Troubleshooting",
+    "subcategory": "Browser-Based Access & RBI",
+    "exam_domain": "Prisma Browser"
+  },
+  {
+    "id": 70,
+    "topic": "Authentication",
+    "type": "single",
+    "selectCount": null,
+    "question": "A user complains of repeated authentication prompts in Prisma Browser only. Mobile Users are fine. What's the best first check? The rollout is managed through centralized policy, and users authenticate via enterprise SSO. The issue is repeatable across multiple devices, and security policy is confirmed identical across regions/tenants. You are asked to identify the most likely design/config cause before making broad changes.",
+    "options": [
+      "Verify Prisma Browser SSO/IdP settings (redirect URI, session lifetime, cookies controls) and whether browser session policies affect auth cookies",
+      "Increase IPsec Phase 2 lifetime",
+      "Disable traffic replication",
+      "Disable QoS"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Repeated prompts often involve SSO session/cookie handling or IdP integration specifics in browser sessions.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Multitenancy, RBAC & Governance",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 71,
+    "topic": "DLP",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer wants to ensure their DLP policy blocks regulated data uploads, but only when traffic is decrypted. They suspect some flows aren't decrypted. What is the best validation? The security team expects policy enforcement based on content inspection, and they need auditability in logs for compliance. Assume the user is not using an alternative network path unless stated, and focus on the most probable control-plane/data-plane reason.",
+    "options": [
+      "Check logs to confirm decryption status on the sessions where DLP should trigger, and confirm policy attachment in the correct rule",
+      "Adjust BGP metrics",
+      "Disable split tunneling",
+      "Enable RBI everywhere"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Validate decryption status and DLP attachment on the actual matching rule path; without decryption, content inspection may not see payloads.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Logging, Visibility & Operations",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 72,
+    "topic": "DLP",
+    "type": "single",
+    "selectCount": null,
+    "question": "A user uploads a file containing credit card numbers to a personal site and it succeeds. DLP is enabled. Most likely root cause? The security team expects policy enforcement based on content inspection, and they need auditability in logs for compliance. Assume the user is not using an alternative network path unless stated, and focus on the most probable control-plane/data-plane reason.",
+    "options": [
+      "The traffic path/rule in use does not have DLP attached (or decryption is bypassing that flow), so DLP never evaluates the content",
+      "QoS is allowing it",
+      "IPsec Phase 1 mismatch",
+      "Compute location too close"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "DLP only triggers if attached to the matching rule path and can inspect content (often requiring decryption).",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Logging, Visibility & Operations",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 73,
+    "topic": "Explicit Proxy",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer uses Explicit Proxy for web. Users complain \"some non-browser apps can't reach the internet.\" What is the best explanation? The organization is using a browser-based approach specifically to avoid granting full network access to unmanaged devices. Users are successfully authenticating, but the behavior differs between managed (full client) and unmanaged (browser) access paths. You need the most likely explanation or next check consistent with least-privilege design.",
+    "options": [
+      "Explicit proxy typically covers proxy-aware traffic; non-proxy apps may bypass unless configured, so full-tunnel MU is different",
+      "QoS blocks non-browser apps",
+      "URL filtering blocks non-browser apps",
+      "RBI is required for non-browser apps"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Explicit proxy relies on proxy-aware client configuration (or specific enforcement). Non-proxy apps may not work through proxy unless configured.",
+    "domain": "Prisma Access Planning & Deployment",
+    "subcategory": "Mobile Users & Endpoint Access",
+    "exam_domain": "Planning & Deployment"
+  },
+  {
+    "id": 74,
+    "topic": "Contractor Access",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer wants \"internet only\" inspection for contractors without giving them network access to internal subnets. Which approach best fits? The scenario is occurring in a production rollout where changes must be targeted and low-risk. Use the option that best reflects first-principles troubleshooting and correct feature intent.",
+    "options": [
+      "Prisma Browser with strict entitlements for no private apps",
+      "Full Mobile User VPN with all routes",
+      "Remote Network onboarding",
+      "Service Connection from contractor laptops"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "A browser-based approach can provide controlled internet access without granting network-level access to internal resources.",
+    "domain": "Prisma Access Services",
+    "subcategory": "Security Enforcement & Inspection",
+    "exam_domain": "Prisma Access Services"
+  },
+  {
+    "id": 75,
+    "topic": "Migration",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer migrates administration from Panorama to Strata Cloud Manager (SCM). After migration, an admin says \"I don't see my tenant.\" Most likely cause? The customer has redundant underlay links and expects deterministic private-app reachability. Monitoring shows the tunnel state remains healthy, but application reachability changes over time. Assume firewall rules on the private side are unchanged since last known-good.",
+    "options": [
+      "RBAC/tenant assignment not mapped correctly in SCM for that admin",
+      "IPsec tunnel down",
+      "URL filtering DB stale",
+      "QoS misclassification"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Visibility issues in management consoles commonly trace to RBAC/tenant assignment rather than data-plane connectivity.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Multitenancy, RBAC & Governance",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 76,
+    "topic": "Copilot",
+    "type": "single",
+    "selectCount": null,
+    "question": "An operations team uses SCM Copilot and expects it to auto-fix policy issues. Which is the most accurate expectation? The customer has redundant underlay links and expects deterministic private-app reachability. Monitoring shows the tunnel state remains healthy, but application reachability changes over time. Assume firewall rules on the private side are unchanged since last known-good.",
+    "options": [
+      "Copilot can assist with insights/summaries/recommendations, but change control/validation is still required before enforcement changes",
+      "Copilot replaces all logging and auditing",
+      "Copilot disables the need for RBAC",
+      "Copilot automatically redeploys tunnels"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Assistant features can help analysis, but policy changes still require proper validation, approvals, and controlled deployment.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Multitenancy, RBAC & Governance",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 77,
+    "topic": "Compliance",
+    "type": "single",
+    "selectCount": null,
+    "question": "A compliance auditor requests evidence that security controls are enforced consistently across tenants and that admin actions are traceable. What is the best response set? Administration is split between a central security team and delegated regional admins. The environment uses shared/baseline objects where appropriate, and scope/attachment determines enforcement. The goal is to resolve the issue while preserving separation of duties.",
+    "options": [
+      "Centralized logs + admin audit trail + documented policy baseline in parent scope + RBAC definitions",
+      "QoS configuration export only",
+      "IPsec proposals only",
+      "Endpoint screenshots only"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Auditors typically need enforcement evidence (logs), administrative traceability (audit trail), and governance structure (baseline + RBAC).",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Multitenancy, RBAC & Governance",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 78,
+    "topic": "Logging",
+    "type": "single",
+    "selectCount": null,
+    "question": "After enabling Strata Logging Service, the SOC still doesn't see logs for a specific tenant. Other tenants are fine. Most likely cause? Administration is split between a central security team and delegated regional admins. The environment uses shared/baseline objects where appropriate, and scope/attachment determines enforcement. The goal is to resolve the issue while preserving separation of duties.",
+    "options": [
+      "Log forwarding/scope isn't enabled for that tenant or the tenant isn't sending to the correct logging instance",
+      "QoS dropped the logs",
+      "BGP route not learned",
+      "Decryption exclusions disabled logging"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Missing logs in one tenant usually indicates forwarding/scope configuration for that tenant rather than network routing.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Logging, Visibility & Operations",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 79,
+    "topic": "Logging",
+    "type": "multi",
+    "selectCount": 2,
+    "question": "A tenant admin reports \"I can't troubleshoot because I don't see traffic logs.\" (Choose two) Which two are the best first checks? Administration is split between a central security team and delegated regional admins. The environment uses shared/baseline objects where appropriate, and scope/attachment determines enforcement. The goal is to resolve the issue while preserving separation of duties.",
+    "options": [
+      "RBAC permissions for log access in that tenant",
+      "Logging enablement/forwarding for that tenant (and retention/search scope)",
+      "IPsec encryption domain",
+      "BGP AS path length"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "First confirm the admin is permitted to view logs, and that logs are being forwarded/stored with proper scope/retention for that tenant.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Logging, Visibility & Operations",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 80,
+    "topic": "Upgrades",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer upgrades an SSE component and afterwards sees unexpected policy behavior. What is the most correct operational response? The scenario is occurring in a production rollout where changes must be targeted and low-risk. Use the option that best reflects first-principles troubleshooting and correct feature intent.",
+    "options": [
+      "Review release notes/known issues, confirm config versioning/rollback, validate rule match behavior via logs, then remediate",
+      "Disable all security inspection",
+      "Change compute location",
+      "Disable identity mapping"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Post-upgrade issues should be handled via structured operations: documentation review, controlled rollback readiness, and log-based validation.",
+    "domain": "Prisma Access Troubleshooting",
+    "subcategory": "Security Enforcement & Inspection",
+    "exam_domain": "Troubleshooting"
+  },
+  {
+    "id": 81,
+    "topic": "MTU",
+    "type": "single",
+    "selectCount": null,
+    "question": "A Remote Network tunnel is up but bandwidth is poor; packet loss appears only for large transfers. What is the best first hypothesis? The site reports the tunnel status as established, and basic pings may succeed intermittently. The change window was recent, and the operations team wants the first check that most quickly narrows root cause. Assume endpoints and application servers are up.",
+    "options": [
+      "MTU/MSS issues on the tunnel path causing fragmentation/blackholing",
+      "URL filtering database is stale",
+      "RBI is failing",
+      "DLP is blocking large files"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Large-transfer loss with tunnel up often indicates MTU/MSS mismatch leading to fragmentation or PMTUD blackholes.",
+    "domain": "Prisma Access Troubleshooting",
+    "subcategory": "Mobile Users & Endpoint Access",
+    "exam_domain": "Troubleshooting"
+  },
+  {
+    "id": 82,
+    "topic": "Underlay",
+    "type": "single",
+    "selectCount": null,
+    "question": "A user says: \"When I'm on home Wi-Fi, private apps are slow; on mobile hotspot they're fine.\" Most likely category to investigate first? The scenario is occurring in a production rollout where changes must be targeted and low-risk. Use the option that best reflects first-principles troubleshooting and correct feature intent.",
+    "options": [
+      "Underlay ISP path/latency to the nearest compute location and whether the user is mapped to a suboptimal region on home Wi-Fi",
+      "URL filtering categories",
+      "Clipboard controls",
+      "BGP communities"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Different underlays can change latency/peering and even region selection. Start by validating path and region mapping differences.",
+    "domain": "Prisma Access Troubleshooting",
+    "subcategory": "Private App Access (ZTNA)",
+    "exam_domain": "Troubleshooting"
+  },
+  {
+    "id": 83,
+    "topic": "Route Preference",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer wants to ensure routes learned from Service Connections do not accidentally override more specific branch routes from Remote Networks. What is the best strategy? The customer has redundant underlay links and expects deterministic private-app reachability. Monitoring shows the tunnel state remains healthy, but application reachability changes over time. Assume firewall rules on the private side are unchanged since last known-good.",
+    "options": [
+      "Use route preference/metrics and ensure summarization doesn't hide more specific RN prefixes",
+      "Disable dynamic routing",
+      "Disable URL filtering",
+      "Enable RBI"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Control route selection with proper metrics/preferences and avoid summarization that could mask more specific routes.",
+    "domain": "Prisma Access Planning & Deployment",
+    "subcategory": "Private App Access (ZTNA)",
+    "exam_domain": "Planning & Deployment"
+  },
+  {
+    "id": 84,
+    "topic": "Security Policy",
+    "type": "single",
+    "selectCount": null,
+    "question": "After a change, a private subnet becomes reachable from Mobile Users but not from Remote Networks. What is the best first check? The rollout is managed through centralized policy, and users authenticate via enterprise SSO. The issue is repeatable across multiple devices, and security policy is confirmed identical across regions/tenants. You are asked to identify the most likely design/config cause before making broad changes.",
+    "options": [
+      "Compare security policy scope/zones for MU vs RN and confirm the rule includes the RN source and destination prefixes",
+      "Disable QoS",
+      "Disable DLP",
+      "Change decryption certificate"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Differences by source type typically point to policy scope/zones/rule criteria rather than routing alone.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Multitenancy, RBAC & Governance",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 85,
+    "topic": "SaaS Security",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer needs to allow only \"sanctioned SaaS\" and block everything else. Users complain legitimate SaaS is blocked. Best immediate step? The scenario is occurring in a production rollout where changes must be targeted and low-risk. Use the option that best reflects first-principles troubleshooting and correct feature intent.",
+    "options": [
+      "Validate SaaS classification/allowlist policy order and use logs to refine exceptions before broad relaxations",
+      "Disable all URL filtering",
+      "Disable identity mapping",
+      "Force all traffic through one SC"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Tight allowlists require iteration based on logs/classification; refine policy order and exceptions rather than removing controls.",
+    "domain": "Prisma Access Troubleshooting",
+    "subcategory": "Data Security (DLP / SaaS / AI / IoT)",
+    "exam_domain": "Troubleshooting"
+  },
+  {
+    "id": 86,
+    "topic": "DLP",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer uses DLP and wants to alert on certain patterns but block on others. Which approach best matches? The security team expects policy enforcement based on content inspection, and they need auditability in logs for compliance. Assume the user is not using an alternative network path unless stated, and focus on the most probable control-plane/data-plane reason.",
+    "options": [
+      "Use DLP profiles/rules with different actions and attach them to the correct security rules by scope",
+      "Use QoS actions",
+      "Use BGP local preference",
+      "Use IPsec lifetimes"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "DLP supports multiple actions (alert/block) based on rule/profile definitions attached to the appropriate enforcement points.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Logging, Visibility & Operations",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 87,
+    "topic": "BYOD",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer wants to enable decryption, but endpoints are unmanaged and they cannot install enterprise trust roots. Which approach is most feasible? The scenario is occurring in a production rollout where changes must be targeted and low-risk. Use the option that best reflects first-principles troubleshooting and correct feature intent.",
+    "options": [
+      "Use Prisma Browser/RBI approaches for BYOD where you can enforce controls without needing to install trust roots on unmanaged endpoints",
+      "Force full decryption anyway; browsers will trust it automatically",
+      "Use IPsec instead of TLS",
+      "Disable all inspection"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Without installing trust roots, full TLS interception is often impractical on BYOD. Browser-based isolation/controls are commonly used to enforce security without endpoint trust root install.",
+    "domain": "Prisma Access Planning & Deployment",
+    "subcategory": "Mobile Users & Endpoint Access",
+    "exam_domain": "Planning & Deployment"
+  },
+  {
+    "id": 88,
+    "topic": "Compute Location",
+    "type": "single",
+    "selectCount": null,
+    "question": "A company has two compute locations active. A user's sessions \"flap\" between them and experience inconsistent policy outcomes. Most likely cause? The scenario is occurring in a production rollout where changes must be targeted and low-risk. Use the option that best reflects first-principles troubleshooting and correct feature intent.",
+    "options": [
+      "User mapping/region selection instability (e.g., IP geolocation changes, DNS steering, or mis-assigned location mapping)",
+      "QoS causes compute flapping",
+      "DLP causes compute flapping",
+      "IPsec Phase 2 rekey causes compute flapping"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Compute flapping usually traces to region mapping inputs (source IP/geo/DNS/assignment) changing or being misconfigured.",
+    "domain": "Prisma Access Troubleshooting",
+    "subcategory": "Connectivity & Routing",
+    "exam_domain": "Troubleshooting"
+  },
+  {
+    "id": 89,
+    "topic": "Troubleshooting",
+    "type": "multi",
+    "selectCount": 2,
+    "question": "A troubleshooting workflow requires determining whether an issue is \"routing/path\" vs \"security enforcement.\" (Choose two) Which two checks best represent that split? The scenario is occurring in a production rollout where changes must be targeted and low-risk. Use the option that best reflects first-principles troubleshooting and correct feature intent.",
+    "options": [
+      "Route table/learned routes and path selection evidence",
+      "Security rule match logs + profile attachments (URL/DLP/decryption)",
+      "Keyboard layout settings",
+      "Endpoint wallpaper theme"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "Routing evidence validates path; rule match and attachments validate enforcement. The other options are irrelevant.",
+    "domain": "Prisma Access Services",
+    "subcategory": "Security Enforcement & Inspection",
+    "exam_domain": "Prisma Access Services"
+  },
+  {
+    "id": 90,
+    "topic": "Browser Controls",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer expects that blocking uploads via \"network policy\" will prevent uploads in Prisma Browser sessions, but it doesn't. Best explanation? The organization is using a browser-based approach specifically to avoid granting full network access to unmanaged devices. Users are successfully authenticating, but the behavior differs between managed (full client) and unmanaged (browser) access paths. You need the most likely explanation or next check consistent with least-privilege design.",
+    "options": [
+      "Prisma Browser has separate browser controls/data controls that must be configured; network rule intent doesn't automatically translate into browser UX controls",
+      "QoS overrides block rules",
+      "BGP disables upload blocks",
+      "IPsec prevents upload controls"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Upload/download/clipboard behavior in browser sessions is governed by browser controls; network rules don't automatically enforce browser UI restrictions.",
+    "domain": "Prisma Access Services",
+    "subcategory": "Browser-Based Access & RBI",
+    "exam_domain": "Prisma Browser"
+  },
+  {
+    "id": 91,
+    "topic": "RBI Exceptions",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer requires that \"executives\" bypass RBI even for risky sites, but still keep inspection. What is the best method? The intent is to allow access while reducing endpoint risk exposure. Users report behavior that suggests either the wrong rule is matching or the wrong action is being taken. Pick the option that best explains the behavior without resorting to global disablement.",
+    "options": [
+      "Use identity/group-based policy exceptions placed above RBI rules, while maintaining inspection profiles",
+      "Disable RBI globally",
+      "Disable decryption for executives only and allow everything",
+      "Put executives into a different compute region"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Create identity-based exceptions with careful rule order so executives bypass isolation but still receive inspection controls.",
+    "domain": "Prisma Access Services",
+    "subcategory": "Browser-Based Access & RBI",
+    "exam_domain": "Prisma Browser"
+  },
+  {
+    "id": 92,
+    "topic": "GlobalProtect",
+    "type": "single",
+    "selectCount": null,
+    "question": "A user can access private apps, but only after disconnecting and reconnecting GlobalProtect. Most likely category? The rollout is managed through centralized policy, and users authenticate via enterprise SSO. The issue is repeatable across multiple devices, and security policy is confirmed identical across regions/tenants. You are asked to identify the most likely design/config cause before making broad changes.",
+    "options": [
+      "Stale routes/policies on the endpoint or delayed identity/posture refresh causing initial mismatch",
+      "URL filtering database corruption",
+      "QoS mislabeling",
+      "RBI token expiration"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Reconnect forcing success often indicates stale endpoint state (routes) or delayed identity/posture evaluation catching up.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Multitenancy, RBAC & Governance",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 93,
+    "topic": "Rulebase Design",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer wants to enforce policy for both Mobile Users and Remote Networks but keep rulebase manageable. Best practice? The rollout is managed through centralized policy, and users authenticate via enterprise SSO. The issue is repeatable across multiple devices, and security policy is confirmed identical across regions/tenants. You are asked to identify the most likely design/config cause before making broad changes.",
+    "options": [
+      "Use shared objects/profiles and a structured rulebase with clear source zones/groups; avoid duplicating rules per site unless necessary",
+      "Create a separate tenant for every site",
+      "Disable identity-based policy",
+      "Disable logging"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Structured rulebases with shared objects and consistent zoning/grouping reduce duplication and improve maintainability and troubleshooting.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Multitenancy, RBAC & Governance",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 94,
+    "topic": "Configuration Scope",
+    "type": "single",
+    "selectCount": null,
+    "question": "A tenant admin complains \"my commit succeeded but nothing changed.\" You find they edited a rule in a template that isn't attached to their tenant. What's the correct explanation? Administration is split between a central security team and delegated regional admins. The environment uses shared/baseline objects where appropriate, and scope/attachment determines enforcement. The goal is to resolve the issue while preserving separation of duties.",
+    "options": [
+      "The config change wasn't in the active policy path for that tenant; attachment/scope determines enforcement",
+      "QoS blocked the commit",
+      "IPsec blocked the commit",
+      "DLP blocked the commit"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "A change in an unattached template/scope won't affect enforcement. Attachment determines what's active.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Multitenancy, RBAC & Governance",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 95,
+    "topic": "Audit",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer wants to validate \"who changed what and when\" for an incident investigation. Most relevant capability? The scenario is occurring in a production rollout where changes must be targeted and low-risk. Use the option that best reflects first-principles troubleshooting and correct feature intent.",
+    "options": [
+      "Admin audit logs/change history + config versioning",
+      "QoS logs",
+      "BGP AS path logs",
+      "Endpoint app store history"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Administrative audit/change logs and version history provide traceability for configuration changes.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Multitenancy, RBAC & Governance",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 96,
+    "topic": "Traffic Replication",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer uses traffic replication. Security asks whether it replaces logging. Correct answer? The SOC relies on centralized logging for investigations, and the question focuses on the most direct reason logs are missing or what to validate first. Assume network reachability exists unless the scenario states otherwise.",
+    "options": [
+      "No—replication is for sending traffic copies/metadata to tools; logging/audit trails are still required for visibility and compliance",
+      "Yes—replication replaces all logs",
+      "Only if QoS is enabled",
+      "Only if decryption is disabled"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "Replication and logging serve different purposes. Replication does not replace logs or administrative audit trails.",
+    "domain": "Prisma Access Services",
+    "subcategory": "Data Security (DLP / SaaS / AI / IoT)",
+    "exam_domain": "Prisma Access Services"
+  },
+  {
+    "id": 97,
+    "topic": "Go-Live Testing",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer wants a realistic go-live test plan for SSE: internet, private apps, DLP, RBI, decryption, identity, and logging. What is the best approach? The security team expects policy enforcement based on content inspection, and they need auditability in logs for compliance. Assume the user is not using an alternative network path unless stated, and focus on the most probable control-plane/data-plane reason.",
+    "options": [
+      "Use a staged rollout with defined test cases per control, validate via logs and user experience, and keep rollback ready",
+      "Roll everything globally at once and see what breaks",
+      "Disable logging until stable",
+      "Disable identity until stable"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "A staged rollout with explicit test cases and rollback readiness minimizes risk and accelerates root-cause analysis.",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Logging, Visibility & Operations",
+    "exam_domain": "Administration & Operation"
+  },
+  {
+    "id": 98,
+    "topic": "Resilience",
+    "type": "multi",
+    "selectCount": 2,
+    "question": "A customer wants to ensure their solution is resilient: one SC goes down, business continues. (Choose two) Which two design elements best support this? The customer has redundant underlay links and expects deterministic private-app reachability. Monitoring shows the tunnel state remains healthy, but application reachability changes over time. Assume firewall rules on the private side are unchanged since last known-good.",
+    "options": [
+      "Redundant connectivity paths/SCs where applicable and tested failover behavior",
+      "Route preference/health behavior validation and monitoring",
+      "Disable decryption",
+      "Disable URL filtering"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "explanation": "Resilience comes from redundancy and validated failover/route behavior with monitoring. Disabling security features doesn't create resilience.",
+    "domain": "Prisma Access Planning & Deployment",
+    "subcategory": "Connectivity & Routing",
+    "exam_domain": "Planning & Deployment"
+  },
+  {
+    "id": 99,
+    "topic": "Entitlements",
+    "type": "single",
+    "selectCount": null,
+    "question": "A user says \"I can access App A but not App B\" and both are private apps behind the same connector. Logs show denies for App B with the correct user. Best next action? The scenario is occurring in a production rollout where changes must be targeted and low-risk. Use the option that best reflects first-principles troubleshooting and correct feature intent.",
+    "options": [
+      "Validate App B entitlement (group membership), app definition (FQDN/port), and rule order—then permit least-privilege",
+      "Change IPsec proposal",
+      "Disable QoS",
+      "Enable RBI"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "A deny with correct user indicates entitlement/app definition/rule order for that app rather than connectivity.",
+    "domain": "Prisma Access Troubleshooting",
+    "subcategory": "Identity & Authentication",
+    "exam_domain": "Troubleshooting"
+  },
+  {
+    "id": 100,
+    "topic": "Comprehensive Security",
+    "type": "single",
+    "selectCount": null,
+    "question": "A customer requires that sensitive uploads be blocked everywhere, but executives can still access risky sites in isolation. They also want centralized visibility for auditors. Which solution set best satisfies all requirements? The intent is to allow access while reducing endpoint risk exposure. Users report behavior that suggests either the wrong rule is matching or the wrong action is being taken. Pick the option that best explains the behavior without resorting to global disablement.",
+    "options": [
+      "DLP with scoped actions + RBI for risky categories with exec exceptions + centralized logging + RBAC separation",
+      "QoS only",
+      "BGP tuning only",
+      "Split tunneling only"
+    ],
+    "correct": [
+      0
+    ],
+    "explanation": "This combines data protection (DLP), web isolation where needed (RBI), exceptions by identity, centralized evidence (logs), and governance (RBAC).",
+    "domain": "Prisma Access Administration & Operations",
+    "subcategory": "Multitenancy, RBAC & Governance",
+    "exam_domain": "Administration & Operation"
+  }
+]

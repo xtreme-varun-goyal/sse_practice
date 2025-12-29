@@ -58,6 +58,30 @@
       padding: 4px 10px;
       font-size: 0.8rem;
     }
+    select#examSelect {
+      background: #020617;
+      color: #facc15;
+      border-radius: 999px;
+      border: 1px solid #facc15;
+      padding: 6px 14px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    select#examSelect:hover {
+      background: #111827;
+    }
+    .exam-selector-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .exam-selector-label {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      font-weight: 600;
+    }
     /* Question progress grid */
     .progress-grid {
       display: flex;
@@ -416,6 +440,16 @@
         box-shadow: 0 10px 30px rgba(0,0,0,0.6);
       }
       h1 { font-size: 1.1rem; margin-bottom: 12px; }
+      .exam-selector-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+      select#examSelect {
+        width: 100%;
+        padding: 10px 14px;
+        font-size: 0.9rem;
+      }
       .meta {
         flex-direction: column;
         align-items: flex-start;
@@ -581,12 +615,21 @@
 <div class="container">
   <h1>Palo Alto SSE-Engineer Practice Exam</h1>
 
+  <!-- Exam Selector (always visible) -->
+  <div class="exam-selector-bar">
+    <span class="exam-selector-label">Select Exam:</span>
+    <select id="examSelect">
+      <option value="sse_questions.json">Practice Exam 1 (50 Questions)</option>
+      <option value="sse_questions_100_enhanced.json">Practice Exam 2 (Enhanced, Exam-Quality)</option>
+    </select>
+  </div>
+
   <!-- Start Screen -->
   <div class="start-screen" id="startScreen">
     <h2>Welcome to the Practice Exam</h2>
     <div class="info-box">
       <ul>
-        <li><strong>50 Questions</strong> - Multiple choice (single and multi-select)</li>
+        <li><strong id="questionCountInfo">50 Questions</strong> - Multiple choice (single and multi-select)</li>
         <li><strong>90 Minutes</strong> - Timer starts when you begin</li>
         <li><strong>Choose your mode</strong> - See answers immediately or at the end</li>
       </ul>
@@ -675,6 +718,7 @@
   let examStarted = false;
   let timerInterval = null;
   let timeRemaining = 90 * 60; // 90 minutes in seconds
+  let currentExamFile = 'sse_questions.json'; // Current exam file
 
   const startScreen = document.getElementById("startScreen");
   const examContent = document.getElementById("examContent");
@@ -702,6 +746,8 @@
   const questionImage = document.getElementById("questionImage");
   const imageModal = document.getElementById("imageModal");
   const modalImage = document.getElementById("modalImage");
+  const examSelect = document.getElementById("examSelect");
+  const questionCountInfo = document.getElementById("questionCountInfo");
 
   // Image modal functions
   function openImageModal() {
@@ -739,20 +785,137 @@
     }
   });
 
-  // IMPORTANT: this assumes the file is named sse_questions.json
-  fetch("sse_questions.json")
-    .then(res => res.json())
-    .then(data => {
-      questions = data;
-      totalQuestionsSpan.textContent = questions.length.toString();
-      buildQuestionSelect();
-      // Don't render question yet - wait for start button
-    })
-    .catch(err => {
-      console.error("Error loading sse_questions.json:", err);
-      startBtn.disabled = true;
-      startBtn.textContent = "Error loading questions";
+  // Weighted selection based on official Palo Alto SSE exam blueprint
+  // Uses exam_domain field from JSON (pre-categorized questions)
+  // Domain weights: Planning (22%), Services (22%), Browser (22%), Admin (16%), Troubleshooting (18%)
+  const domainWeights = {
+    'Planning & Deployment': 11,        // 22% of 50
+    'Prisma Access Services': 11,       // 22% of 50
+    'Prisma Browser': 11,               // 22% of 50
+    'Administration & Operation': 8,    // 16% of 50
+    'Troubleshooting': 9                // 18% of 50
+  };
+
+  // Select questions with weighted domain distribution using exam_domain field
+  function selectWeightedQuestions(allQuestions, targetCount) {
+    const selectedQuestions = [];
+    const usedIds = new Set();
+
+    // Group questions by their exam_domain field
+    const questionsByDomain = {};
+    for (const domain in domainWeights) {
+      questionsByDomain[domain] = [];
+    }
+
+    allQuestions.forEach(q => {
+      const domain = q.exam_domain;
+      if (domain && questionsByDomain[domain]) {
+        questionsByDomain[domain].push(q);
+      }
     });
+
+    // Shuffle each domain's questions
+    for (const domain in questionsByDomain) {
+      questionsByDomain[domain] = shuffleArray(questionsByDomain[domain]);
+    }
+
+    // Select required count from each domain
+    for (const [domain, count] of Object.entries(domainWeights)) {
+      const available = questionsByDomain[domain].filter(q => !usedIds.has(q.id));
+      const toSelect = Math.min(count, available.length);
+
+      for (let i = 0; i < toSelect; i++) {
+        selectedQuestions.push(available[i]);
+        usedIds.add(available[i].id);
+      }
+    }
+
+    // If we need more questions to reach target, fill from remaining
+    if (selectedQuestions.length < targetCount) {
+      const remaining = allQuestions.filter(q => !usedIds.has(q.id));
+      const shuffledRemaining = shuffleArray(remaining);
+      const needed = targetCount - selectedQuestions.length;
+
+      for (let i = 0; i < Math.min(needed, shuffledRemaining.length); i++) {
+        selectedQuestions.push(shuffledRemaining[i]);
+      }
+    }
+
+    // Final shuffle to mix domains
+    return shuffleArray(selectedQuestions);
+  }
+
+  // Load exam questions from JSON file
+  function loadExam(examFile) {
+    currentExamFile = examFile;
+    startBtn.disabled = true;
+    startBtn.textContent = "Loading...";
+
+    fetch(examFile)
+      .then(res => res.json())
+      .then(data => {
+        // For the enhanced exam, shuffle all questions
+        if (examFile === 'sse_questions_100_enhanced.json') {
+          questions = shuffleArray(data);
+        } else {
+          questions = data;
+        }
+        totalQuestionsSpan.textContent = questions.length.toString();
+        questionCountInfo.textContent = `${questions.length} Questions`;
+        buildQuestionSelect();
+        startBtn.disabled = false;
+        startBtn.textContent = "Start Exam";
+      })
+      .catch(err => {
+        console.error(`Error loading ${examFile}:`, err);
+        startBtn.disabled = true;
+        startBtn.textContent = "Error loading questions";
+      });
+  }
+
+  // Initial load
+  loadExam(currentExamFile);
+
+  // Exam selector change handler
+  examSelect.addEventListener('change', (e) => {
+    const selectedExam = e.target.value;
+
+    // If exam is in progress, confirm before switching
+    if (examStarted) {
+      if (!confirm("Switching exams will reset your progress. Are you sure?")) {
+        examSelect.value = currentExamFile; // Revert selection
+        return;
+      }
+      // Reset exam state
+      stopTimer();
+      currentQuestion = 0;
+      score = 0;
+      userAnswers = [];
+      examStarted = false;
+      timeRemaining = 90 * 60;
+
+      // Hide exam content, show start screen
+      examContent.classList.add('hidden');
+      timerBar.classList.add('hidden');
+      startScreen.classList.remove('hidden');
+
+      // Reset UI elements
+      summaryBox.classList.add('hidden');
+      summaryBox.innerHTML = '';
+      resultBox.classList.add('hidden');
+      finishBtn.classList.add('hidden');
+      modeSelector.classList.remove('locked');
+
+      // Reset mode selectors
+      document.querySelectorAll('input[name="answerMode"], input[name="startAnswerMode"]').forEach(radio => {
+        radio.checked = radio.value === 'end';
+      });
+
+      updateTimerDisplay();
+    }
+
+    loadExam(selectedExam);
+  });
 
   // Timer functions
   function formatTime(seconds) {
